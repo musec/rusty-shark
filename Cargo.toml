@@ -1,0 +1,12 @@
+[package]
+name = "rshark"
+version = "0.0.1"
+authors = ["Jonathan Anderson <jonathan.anderson@mun.ca>"]
+
+[dependencies]
+byteorder = "0.3.11"
+pcap = "0.3.2"
+
+[[bin]]
+doc = false
+name = "rshark"
