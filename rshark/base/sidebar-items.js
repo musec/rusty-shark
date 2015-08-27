@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Endianness",""],["Error",""],["Val",""]],"fn":[["raw",""],["signed",""],["unsigned",""]],"type":[["Dissector",""],["NamedValue","A named value-or-error."],["Result",""]]});

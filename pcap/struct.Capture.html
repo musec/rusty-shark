@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Capture` struct in crate `pcap`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Capture">
+
+    <title>pcap::Capture - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <section class="sidebar">
+        
+        <p class='location'><a href='index.html'>pcap</a></p><script>window.sidebarCurrent = {name: 'Capture', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </section>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>pcap</a>::<wbr><a class='struct' href=''>Capture</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-6270' class='srclink' href='../src/pcap/lib.rs.html#326-329' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Capture&lt;T: <a class='trait' href='../pcap/trait.State.html' title='pcap::State'>State</a>&gt; {
+    // some fields omitted
+}</pre><div class='docblock'><p>This is a pcap capture handle which is an abstraction over the <code>pcap_t</code> provided by pcap.
+There are many ways to instantiate and interact with a pcap handle, so phantom types are
+used to express these behaviors.</p>
+
+<p><strong><code>Capture&lt;Inactive&gt;</code></strong> is created via <code>Capture::from_device()</code>. This handle is inactive,
+so you cannot (yet) obtain packets from it. However, you can configure things like the
+buffer size, snaplen, timeout, and promiscuity before you activate it.</p>
+
+<p><strong><code>Capture&lt;Active&gt;</code></strong> is created by calling <code>.open()</code> on a <code>Capture&lt;Inactive&gt;</code>. This
+activates the capture handle, allowing you to get packets with <code>.next()</code> or apply filters
+with <code>.filter()</code>.</p>
+
+<p><strong><code>Capture&lt;Offline&gt;</code></strong> is created via <code>Capture::from_file()</code>. This allows you to read a
+pcap format dump file as if you were opening an interface -- very useful for testing or 
+analysis.</p>
+
+<h1 id="example:" class='section-header'><a
+                           href="#example:">Example:</a></h1><pre class='rust rust-example-rendered'>
+<span class='kw'>let</span> <span class='ident'>cap</span> <span class='op'>=</span> <span class='ident'>Capture</span>::<span class='ident'>from_device</span>(<span class='ident'>Device</span>::<span class='ident'>lookup</span>().<span class='ident'>unwrap</span>()) <span class='comment'>// open the &quot;default&quot; interface</span>
+              .<span class='ident'>unwrap</span>() <span class='comment'>// assume the device exists and we are authorized to open it</span>
+              .<span class='ident'>open</span>() <span class='comment'>// activate the handle</span>
+              .<span class='ident'>unwrap</span>(); <span class='comment'>// assume activation worked</span>
+
+<span class='kw'>while</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>packet</span>) <span class='op'>=</span> <span class='ident'>cap</span>.<span class='ident'>next</span>() {
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;received packet! {:?}&quot;</span>, <span class='ident'>packet</span>);
+}</pre>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../pcap/struct.Capture.html' title='pcap::Capture'>Capture</a>&lt;<a class='enum' href='../pcap/enum.Offline.html' title='pcap::Offline'>Offline</a>&gt;</code></h3><div class='impl-items'><h4 id='method.from_file' class='method'><code>fn <a href='#method.from_file' class='fnname'>from_file</a>&lt;P: <a class='trait' href='http://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='http://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt;&gt;(path: P) -&gt; <a class='enum' href='http://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../pcap/struct.Capture.html' title='pcap::Capture'>Capture</a>&lt;<a class='enum' href='../pcap/enum.Offline.html' title='pcap::Offline'>Offline</a>&gt;, <a class='enum' href='../pcap/enum.Error.html' title='pcap::Error'>Error</a>&gt;</code></h4>
+<div class='docblock'><p>Opens an offline capture handle from a pcap dump file, given a path.</p>
+</div></div><h3 class='impl'><code>impl <a class='struct' href='../pcap/struct.Capture.html' title='pcap::Capture'>Capture</a>&lt;<a class='enum' href='../pcap/enum.Inactive.html' title='pcap::Inactive'>Inactive</a>&gt;</code></h3><div class='impl-items'><h4 id='method.from_device' class='method'><code>fn <a href='#method.from_device' class='fnname'>from_device</a>&lt;D: <a class='trait' href='http://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='struct' href='../pcap/struct.Device.html' title='pcap::Device'>Device</a>&gt;&gt;(device: D) -&gt; <a class='enum' href='http://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../pcap/struct.Capture.html' title='pcap::Capture'>Capture</a>&lt;<a class='enum' href='../pcap/enum.Inactive.html' title='pcap::Inactive'>Inactive</a>&gt;, <a class='enum' href='../pcap/enum.Error.html' title='pcap::Error'>Error</a>&gt;</code></h4>
+<div class='docblock'><p>Opens a capture handle for a device. You can pass a <code>Device</code> or an <code>&amp;str</code> device
+name here. The handle is inactive, but can be activated via <code>.open()</code>.</p>
+</div><h4 id='method.open' class='method'><code>fn <a href='#method.open' class='fnname'>open</a>(self) -&gt; <a class='enum' href='http://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../pcap/struct.Capture.html' title='pcap::Capture'>Capture</a>&lt;<a class='enum' href='../pcap/enum.Active.html' title='pcap::Active'>Active</a>&gt;, <a class='enum' href='../pcap/enum.Error.html' title='pcap::Error'>Error</a>&gt;</code></h4>
+<div class='docblock'><p>Activates an inactive capture created from <code>Capture::from_device()</code> or returns
+an error.</p>
+</div><h4 id='method.timeout' class='method'><code>fn <a href='#method.timeout' class='fnname'>timeout</a>(self, ms: <a href='http://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>) -&gt; <a class='struct' href='../pcap/struct.Capture.html' title='pcap::Capture'>Capture</a>&lt;<a class='enum' href='../pcap/enum.Inactive.html' title='pcap::Inactive'>Inactive</a>&gt;</code></h4>
+<div class='docblock'><p>Set the read timeout for the Capture. By default, this is 0, so it will block
+indefinitely.</p>
+</div><h4 id='method.promisc' class='method'><code>fn <a href='#method.promisc' class='fnname'>promisc</a>(self, to: <a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='struct' href='../pcap/struct.Capture.html' title='pcap::Capture'>Capture</a>&lt;<a class='enum' href='../pcap/enum.Inactive.html' title='pcap::Inactive'>Inactive</a>&gt;</code></h4>
+<div class='docblock'><p>Set promiscuous mode on or off. By default, this is off.</p>
+</div><h4 id='method.rfmon' class='method'><code>fn <a href='#method.rfmon' class='fnname'>rfmon</a>(self, to: <a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='struct' href='../pcap/struct.Capture.html' title='pcap::Capture'>Capture</a>&lt;<a class='enum' href='../pcap/enum.Inactive.html' title='pcap::Inactive'>Inactive</a>&gt;</code></h4>
+<div class='docblock'><p>Set rfmon mode on or off. The default is maintained by pcap.</p>
+</div><h4 id='method.buffer_size' class='method'><code>fn <a href='#method.buffer_size' class='fnname'>buffer_size</a>(self, to: <a href='http://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>) -&gt; <a class='struct' href='../pcap/struct.Capture.html' title='pcap::Capture'>Capture</a>&lt;<a class='enum' href='../pcap/enum.Inactive.html' title='pcap::Inactive'>Inactive</a>&gt;</code></h4>
+<div class='docblock'><p>Set the buffer size for incoming packet data.</p>
+
+<p>The default is 1000000. This should always be larger than the snaplen.</p>
+</div><h4 id='method.snaplen' class='method'><code>fn <a href='#method.snaplen' class='fnname'>snaplen</a>(self, to: <a href='http://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>) -&gt; <a class='struct' href='../pcap/struct.Capture.html' title='pcap::Capture'>Capture</a>&lt;<a class='enum' href='../pcap/enum.Inactive.html' title='pcap::Inactive'>Inactive</a>&gt;</code></h4>
+<div class='docblock'><p>Set the snaplen size (the maximum length of a packet captured into the buffer).
+Useful if you only want certain headers, but not the entire packet.</p>
+
+<p>The default is 65535</p>
+</div></div><h3 class='impl'><code>impl&lt;T: <a class='trait' href='../pcap/trait.Activated.html' title='pcap::Activated'>Activated</a>&gt; <a class='struct' href='../pcap/struct.Capture.html' title='pcap::Capture'>Capture</a>&lt;T&gt;</code></h3><div class='docblock'>
+<h1 id="activated-captures-include-capture&lt;active&gt;-and-capture&lt;offline&gt;." class='section-header'><a
+                           href="#activated-captures-include-capture&lt;active&gt;-and-capture&lt;offline&gt;.">Activated captures include <code>Capture&lt;Active&gt;</code> and <code>Capture&lt;Offline&gt;</code>.</a></h1></div><div class='impl-items'><h4 id='method.list_datalinks' class='method'><code>fn <a href='#method.list_datalinks' class='fnname'>list_datalinks</a>(&amp;self) -&gt; <a class='enum' href='http://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='http://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../pcap/struct.Linktype.html' title='pcap::Linktype'>Linktype</a>&gt;, <a class='enum' href='../pcap/enum.Error.html' title='pcap::Error'>Error</a>&gt;</code></h4>
+<div class='docblock'><p>List the datalink types that this captured device supports.</p>
+</div><h4 id='method.set_datalink' class='method'><code>fn <a href='#method.set_datalink' class='fnname'>set_datalink</a>(&amp;mut self, linktype: <a class='struct' href='../pcap/struct.Linktype.html' title='pcap::Linktype'>Linktype</a>) -&gt; <a class='enum' href='http://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../pcap/enum.Error.html' title='pcap::Error'>Error</a>&gt;</code></h4>
+<div class='docblock'><p>Set the datalink type for the current capture handle.</p>
+</div><h4 id='method.get_datalink' class='method'><code>fn <a href='#method.get_datalink' class='fnname'>get_datalink</a>(&amp;self) -&gt; <a class='struct' href='../pcap/struct.Linktype.html' title='pcap::Linktype'>Linktype</a></code></h4>
+<div class='docblock'><p>Get the current datalink type for this capture handle.</p>
+</div><h4 id='method.savefile' class='method'><code>fn <a href='#method.savefile' class='fnname'>savefile</a>&lt;P: <a class='trait' href='http://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='http://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt;&gt;(&amp;self, path: P) -&gt; <a class='enum' href='http://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../pcap/struct.Savefile.html' title='pcap::Savefile'>Savefile</a>, <a class='enum' href='../pcap/enum.Error.html' title='pcap::Error'>Error</a>&gt;</code></h4>
+<div class='docblock'><p>Create a <code>Savefile</code> context for recording captured packets using this <code>Capture</code>&#39;s
+configurations.</p>
+</div><h4 id='method.next' class='method'><code>fn <a href='#method.next' class='fnname'>next</a>&lt;'a&gt;(&amp;'a mut self) -&gt; <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../pcap/struct.Packet.html' title='pcap::Packet'>Packet</a>&lt;'a&gt;&gt;</code></h4>
+<div class='docblock'><p>Blocks until a packet is returned from the capture handle or an error occurs.</p>
+
+<p>pcap captures packets and places them into a buffer which this function reads
+from. This buffer has a finite length, so if the buffer fills completely new
+packets will be discarded temporarily. This means that in realtime situations,
+you probably want to minimize the time between calls of this next() method.</p>
+</div><h4 id='method.filter' class='method'><code>fn <a href='#method.filter' class='fnname'>filter</a>(&amp;mut self, program: &amp;<a href='http://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='http://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../pcap/enum.Error.html' title='pcap::Error'>Error</a>&gt;</code></h4>
+<div class='docblock'><p>Adds a filter to the capture using the given BPF program string. Internally
+this is compiled using <code>pcap_compile()</code>.</p>
+
+<p>See <a href="http://biot.com/capstats/bpf.html">http://biot.com/capstats/bpf.html</a> for more information about this syntax.</p>
+</div></div><h3 class='impl'><code>impl <a class='struct' href='../pcap/struct.Capture.html' title='pcap::Capture'>Capture</a>&lt;<a class='enum' href='../pcap/enum.Active.html' title='pcap::Active'>Active</a>&gt;</code></h3><div class='impl-items'><h4 id='method.sendpacket' class='method'><code>fn <a href='#method.sendpacket' class='fnname'>sendpacket</a>&lt;'a&gt;(&amp;mut self, buf: <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;'a [</a><a href='http://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a class='enum' href='http://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>, <a class='enum' href='../pcap/enum.Error.html' title='pcap::Error'>Error</a>&gt;</code></h4>
+<div class='docblock'><p>Sends a packet over this capture handle&#39;s interface, returning the number
+of bytes written.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;T: <a class='trait' href='../pcap/trait.State.html' title='pcap::State'>State</a>&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../pcap/struct.Capture.html' title='pcap::Capture'>Capture</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='http://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#method.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <div id="help" class="hidden">
+        <div>
+            <div class="shortcuts">
+                <h1>Keyboard Shortcuts</h1>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h1>Search Tricks</h1>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>typedef</code> (or
+                    <code>tdef</code>).
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "pcap";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script async src="../search-index.js"></script>
+</body>
+</html>
