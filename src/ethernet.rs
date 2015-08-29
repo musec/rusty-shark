@@ -15,8 +15,8 @@ use {
 
 pub fn dissect(data : &[u8]) -> Result {
     if data.len() < 14 {
-        return Err(Error::Underflow(14, data.len(),
-            "An Ethernet frame must be at least 14 B".to_string()))
+        return Err(Error::Underflow { expected: 14, have: data.len(),
+            message: "An Ethernet frame must be at least 14 B".to_string() })
     }
 
     let mut values:Vec<NamedValue> = vec![];

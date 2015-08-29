@@ -19,8 +19,8 @@ use {
 
 pub fn dissect(data : &[u8]) -> Result {
     if data.len() < 20 {
-        return Err(Error::Underflow(20, data.len(),
-            "An IP packet must be at least 20 B".to_string()))
+        return Err(Error::Underflow { expected: 20, have: data.len(),
+            message: "An IP packet must be at least 20 B".to_string() })
     }
 
     let mut values:Vec<NamedValue> = vec![];

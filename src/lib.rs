@@ -164,16 +164,16 @@ impl fmt::Display for Val {
 /// An error related to packet dissection (underflow, bad value, etc.).
 #[derive(Debug)]
 pub enum Error {
-    Underflow(usize, usize, String),
+    Underflow { expected: usize, have: usize, message: String, },
     InvalidData(String),
 }
 
 impl fmt::Display for Error {
     fn fmt(&self, f : &mut fmt::Formatter) -> fmt::Result {
         match self {
-            &Error::Underflow(expected, have, ref msg) =>
+            &Error::Underflow { expected, have, ref message } =>
                 write![f, "underflow (expected {}, have {}): {}",
-                    expected, have, msg],
+                    expected, have, message],
 
             &Error::InvalidData(ref msg) => write![f, "invalid data: {}", msg],
         }
