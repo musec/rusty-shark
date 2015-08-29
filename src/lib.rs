@@ -48,6 +48,8 @@
 //! (useful in graphical displays) and can be pretty-printed with indentation for
 //! sub-objects.
 
+#![doc(html_logo_url = "https://raw.githubusercontent.com/musec/rusty-shark/master/artwork/wordmark.png")]
+
 extern crate byteorder;
 
 use byteorder::ReadBytesExt;
