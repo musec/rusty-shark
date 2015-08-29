@@ -1,5 +1,6 @@
 //!
-//! `rshark`, the Rusty Shark library, is a library for inspecting malicious packets.
+//! `rshark`, the Rusty Shark library, is a library for deep inspection
+//! of malicious packets.
 //!
 //! # Background
 //!
