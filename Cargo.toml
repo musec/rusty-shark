@@ -5,7 +5,9 @@ authors = ["Jonathan Anderson <jonathan.anderson@mun.ca>"]
 
 [dependencies]
 byteorder = "0.3.11"
-pcap = "0.3.2"
+docopt = "0.6.70"
+pcap = "0.4.2"
+rustc-serialize="*"
 
 [[bin]]
 doc = false
