@@ -34,7 +34,7 @@
             <div class="search-container">
                 <input class="search-input" name="search"
                        autocomplete="off"
-                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       placeholder="Click or press 'S' to search, '?' for more options..."
                        type="search">
             </div>
         </form>
@@ -45,30 +45,17 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-0' class='srclink' href='../src/pcap/lib.rs.html#1-607' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-0' class='srclink' href='../src/pcap/lib.rs.html#1-598' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>pcap is a packet capture library available on Linux, Windows and Mac. This
 crate supports creating and configuring capture contexts, sniffing packets,
 sending packets to interfaces, listing devices, and recording packet captures
 to pcap-format dump files.</p>
 
-<h1 id="getting-devices" class='section-header'><a
-                           href="#getting-devices">Getting devices</a></h1>
-<p>The first step to packet sniffing using pcap is picking which device you want
-to capture from. <code>Device::lookup()</code> returns a <code>Device</code> that contains the first
-non-loopback device pcap is aware of. You can also use <code>Device::list()</code> to 
-obtain a list of <code>Device</code>s for capturing.</p>
-<pre class='rust rust-example-rendered'>
-<span class='kw'>use</span> <span class='ident'>pcap</span>::<span class='ident'>Device</span>;
-
-<span class='kw'>fn</span> <span class='ident'>main</span>() {
-    <span class='kw'>let</span> <span class='ident'>main_device</span> <span class='op'>=</span> <span class='ident'>Device</span>::<span class='ident'>lookup</span>().<span class='ident'>unwrap</span>();
-    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;Device name: {}&quot;</span>, <span class='ident'>main_device</span>.<span class='ident'>name</span>);
-}</pre>
-
 <h1 id="capturing-packets" class='section-header'><a
                            href="#capturing-packets">Capturing packets</a></h1>
 <p>The easiest way to open an active capture handle and begin sniffing is to
-use <code>.open()</code> on a <code>Device</code>.</p>
+use <code>.open()</code> on a <code>Device</code>. You can obtain the &quot;default&quot; device using
+<code>Device::lookup()</code>, or you can obtain the device(s) you need via <code>Device::list_all()</code>.</p>
 <pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>pcap</span>::<span class='ident'>Device</span>;
  
@@ -78,7 +65,8 @@ use <code>.open()</code> on a <code>Device</code>.</p>
     <span class='kw'>while</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>packet</span>) <span class='op'>=</span> <span class='ident'>cap</span>.<span class='ident'>next</span>() {
         <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;received packet! {:?}&quot;</span>, <span class='ident'>packet</span>);
     }
-}</pre>
+}
+</pre>
 
 <p><code>Capture</code>&#39;s <code>.next()</code> will produce a <code>Packet</code> which can be dereferenced to access the
 <code>&amp;[u8]</code> packet contents.</p>
@@ -99,8 +87,11 @@ turn it into a <code>Capture&lt;Active&gt;</code>.</p>
                       .<span class='ident'>snaplen</span>(<span class='number'>5000</span>)
                       .<span class='ident'>open</span>().<span class='ident'>unwrap</span>();
      
-    <span class='comment'>// ...</span>
-}</pre>
+    <span class='kw'>while</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>packet</span>) <span class='op'>=</span> <span class='ident'>cap</span>.<span class='ident'>next</span>() {
+        <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;received packet! {:?}&quot;</span>, <span class='ident'>packet</span>);
+    }
+}
+</pre>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                     <tr class=' module-item'>
@@ -223,44 +214,37 @@ errors.</p>
     <section class="footer"></section>
 
     <div id="help" class="hidden">
-        <div>
-            <div class="shortcuts">
-                <h1>Keyboard Shortcuts</h1>
-
-                <dl>
-                    <dt>?</dt>
-                    <dd>Show this help dialog</dd>
-                    <dt>S</dt>
-                    <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
-                    <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
-                    <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
-                    <dd>Go to active search result</dd>
-                </dl>
-            </div>
-
-            <div class="infos">
-                <h1>Search Tricks</h1>
-
-                <p>
-                    Prefix searches with a type followed by a colon (e.g.
-                    <code>fn:</code>) to restrict the search to a given type.
-                </p>
-
-                <p>
-                    Accepted types are: <code>fn</code>, <code>mod</code>,
-                    <code>struct</code>, <code>enum</code>,
-                    <code>trait</code>, <code>typedef</code> (or
-                    <code>tdef</code>).
-                </p>
-
-                <p>
-                    Search functions by type signature (e.g.
-                    <code>vec -> usize</code>)
-                </p>
-            </div>
+        <div class="shortcuts">
+            <h1>Keyboard shortcuts</h1>
+            <dl>
+                <dt>?</dt>
+                <dd>Show this help dialog</dd>
+                <dt>S</dt>
+                <dd>Focus the search field</dd>
+                <dt>&larrb;</dt>
+                <dd>Move up in search results</dd>
+                <dt>&rarrb;</dt>
+                <dd>Move down in search results</dd>
+                <dt>&#9166;</dt>
+                <dd>Go to active search result</dd>
+            </dl>
+        </div>
+        <div class="infos">
+            <h1>Search tricks</h1>
+            <p>
+                Prefix searches with a type followed by a colon (e.g.
+                <code>fn:</code>) to restrict the search to a given type.
+            </p>
+            <p>
+                Accepted types are: <code>fn</code>, <code>mod</code>,
+                <code>struct</code>, <code>enum</code>,
+                <code>trait</code>, <code>typedef</code> (or
+                <code>tdef</code>).
+            </p>
+            <p>
+                Search functions by type signature (e.g.
+                <code>vec -> usize</code>)
+            </p>
         </div>
     </div>
 
