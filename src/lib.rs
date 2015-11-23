@@ -82,6 +82,7 @@ use std::io;
 ///
 ///  * tracking original bytes (by reference or by index?)
 ///  * supporting error metadata (e.g., "parsed ok but checksum doesn't match")
+///  * supporting asynchronous sub-object parsing (some sort of promises?)
 ///
 pub enum Val {
     /// A signed integer, in machine-native representation.
