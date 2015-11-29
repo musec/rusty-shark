@@ -74,13 +74,13 @@ pub fn dissect(data : &[u8]) -> Result {
     let source = &data[12..16];
     values.push(("Source".to_string(), Ok(Val::Address {
         bytes: source.to_vec(),
-        encoded: source.iter().map(|b| b.to_string()).collect::<Vec<_>>().connect("."),
+        encoded: source.iter().map(|b| b.to_string()).collect::<Vec<_>>().join("."),
     })));
 
     let dest = &data[16..20];
     values.push(("Destination".to_string(), Ok(Val::Address {
         bytes: dest.to_vec(),
-        encoded: dest.iter().map(|b| b.to_string()).collect::<Vec<_>>().connect("."),
+        encoded: dest.iter().map(|b| b.to_string()).collect::<Vec<_>>().join("."),
     })));
 
     // Parse the remainder according to the specified protocol.
