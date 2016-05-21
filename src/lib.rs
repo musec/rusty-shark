@@ -63,7 +63,6 @@
 extern crate byteorder;
 
 use byteorder::ReadBytesExt;
-use std::fmt::Display;
 use std::fmt;
 use std::io;
 
