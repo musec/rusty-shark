@@ -9,11 +9,11 @@ repository = "https://github.com/musec/rusty-shark"
 readme = "README.md"
 
 [dependencies]
-byteorder = "0.3.11"
-docopt = "0.6.70"
+byteorder = "0.5.2"
+docopt = "0.6.80"
 pcap = "0.5.7"
 promising-future = "0.2.2"
-rustc-serialize="*"
+rustc-serialize="0.3.19"
 
 [[bin]]
 doc = false
