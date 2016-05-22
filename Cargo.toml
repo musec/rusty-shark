@@ -11,7 +11,7 @@ readme = "README.md"
 [dependencies]
 byteorder = "0.3.11"
 docopt = "0.6.70"
-pcap = "0.4.2"
+pcap = "0.5.7"
 promising-future = "0.2.2"
 rustc-serialize="*"
 

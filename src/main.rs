@@ -63,7 +63,7 @@ fn main() {
         .map(|mut c| {
             let mut count = 0;
 
-            while let Some(packet) = c.next() {
+            while let Ok(packet) = c.next() {
                 println!("{}-B packet:", packet.data.len());
 
                 match protocol.dissect(packet.data) {
