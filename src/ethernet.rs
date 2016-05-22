@@ -10,24 +10,43 @@
 //! Dissection of Ethernet (IEEE 802.3) frames.
 
 use {
-    Dissector,
     Endianness,
     Error,
     NamedValue,
+    Protocol,
+    RawBytes,
     Result,
     Val,
     ip,
-    raw,
+    promising_future,
     unsigned,
 };
 
 
-pub fn dissect(data : &[u8]) -> Result {
-    if data.len() < 14 {
-        return Err(Error::Underflow { expected: 14, have: data.len(),
-            message: "An Ethernet frame must be at least 14 B".to_string() })
-    }
+/// The IEEE 802.3 Ethernet protocol.
+pub struct Ethernet;
 
+impl Protocol for Ethernet {
+    fn short_name(&self) -> &str { "Ethernet" }
+    fn full_name(&self) -> &str { "IEEE 802.3 Ethernet" }
+    fn dissect(&self, data: &[u8]) -> Result {
+        if data.len() < 14 {
+            return Err(Error::Underflow { expected: 14, have: data.len(),
+                message: "An Ethernet frame must be at least 14 B".to_string() })
+        }
+
+        // Process fields asynchronously.
+        let (future, promise) = promising_future::future_promise();
+
+        // TODO: actually process asynchronously!
+        promise.set(dissect_fields(data));
+
+        Ok(Val::Protocol(future))
+    }
+}
+
+
+fn dissect_fields(data: &[u8]) -> Vec<NamedValue> {
     let mut values:Vec<NamedValue> = vec![];
     values.push(("Destination".to_string(), Ok(Val::Bytes(data[0..6].to_vec()))));
     values.push(("Source".to_string(), Ok(Val::Bytes(data[6..12].to_vec()))));
@@ -42,34 +61,24 @@ pub fn dissect(data : &[u8]) -> Result {
         },
 
         Ok(i) => {
-            let (protocol, dissector): (Result<&str>, Dissector) = match i {
-                0x800 => (Ok("IP"), ip::dissect),
-                0x806 => (Ok("ARP"), raw),
-                0x8138 => (Ok("IPX"), raw),
-                0x86dd => (Ok("IPv6"), raw),
-                _ => (
-                    Err(Error::InvalidData(format!["unknown protocol: {:x}", i])),
-                    raw
-                ),
+            let protocol: Box<Protocol> = match i {
+                // TODO: use the simple 'box' syntax once it hits stable
+                0x800 => Box::new(ip::IPv4),
+                0x806 => RawBytes::boxed("ARP", "Address Resolution Protocol"),
+                0x8138 => RawBytes::boxed("IPX", "Internetwork Packet Exchange"),
+                0x86dd => RawBytes::boxed("IPv6", "Internet Protocol version 6"),
+
+                _ => Box::new(RawBytes::unknown_protocol()),
             };
 
-            let (ty, subname):(Result,String) = match protocol {
-                Ok(name) =>
-                    (
-                        Ok(Val::String(name.to_string())),
-                        format!["{} data", name]
-                    ),
-
-                Err(e) => (Err(e), "Unknown protocol data".to_string()),
-            };
-
-            values.push(("Type".to_string(), ty));
-            values.push((subname, dissector(remainder)));
+            let protoname = protocol.short_name().to_string();
+            values.push(("Type".to_string(), Ok(Val::String(protoname))));
+            values.push(("data".to_string(), protocol.dissect(remainder)));
         },
         Err(e) => {
             values.push(("Type/length".to_string(), Err(e)));
         },
     };
 
-    Ok(Val::Object(values))
+    values
 }

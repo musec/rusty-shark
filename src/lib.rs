@@ -61,10 +61,25 @@
 #![doc(html_logo_url = "https://raw.githubusercontent.com/musec/rusty-shark/master/artwork/wordmark.png")]
 
 extern crate byteorder;
+extern crate promising_future;
 
 use byteorder::ReadBytesExt;
+pub use promising_future::Future;
 use std::fmt;
 use std::io;
+
+
+/// A description of a protocol, including code that can parse it.
+pub trait Protocol {
+    /// A short name that can fit in a user display, e.g., "IPv6".
+    fn short_name(&self) -> &str;
+
+    /// A complete, unambigous protocol name, e.g., "Internet Protocol version 6"
+    fn full_name(&self) -> &str;
+
+    /// A function to dissect some bytes according to the protocol.
+    fn dissect(&self, &[u8]) -> Result;
+}
 
 
 /// A value parsed from a packet.
@@ -75,8 +90,8 @@ use std::io;
 ///
 ///  * tracking original bytes (by reference or by index?)
 ///  * supporting error metadata (e.g., "parsed ok but checksum doesn't match")
-///  * supporting asynchronous sub-object parsing (some sort of promises?)
 ///
+#[derive(Debug)]
 pub enum Val {
     /// A signed integer, in machine-native representation.
     Signed(i64),
@@ -90,65 +105,44 @@ pub enum Val {
     /// A network address, which can have its own special encoding.
     Address { bytes: Vec<u8>, encoded: String },
 
-    /// A sub-object is an ordered set of (name,value) tuples.
-    Object(Vec<NamedValue>),
+    /// A protocol can asynchronously parse a subset of this value's bytes.
+    Protocol(Future<Vec<NamedValue>>),
 
     /// Raw bytes, e.g., a checksum or just unparsed data.
     Bytes(Vec<u8>),
 }
 
 impl Val {
-    pub fn pretty_print(&self, indent:usize) -> String {
+    pub fn pretty_print(self, indent:usize) -> String {
         match self {
-            &Val::Object(ref values) => {
+            Val::Protocol(future) => {
                 let mut s = "\n".to_string();
                 let prefix =
                     ::std::iter::repeat(" ").take(2 * indent).collect::<String>();
 
-                for &(ref k, ref v) in values {
-                    s = s + &format!["{}{}: ", prefix, k];
-                    s = s + &*(match v {
-                        &Ok(ref value) => value.pretty_print(indent + 1),
-                        &Err(ref e) => format!["<< Error: {} >>", e],
-                    });
-                    s = s + "\n";
-                }
+                match future.value() {
+                    None => s = s + "<<Error: values not parsed>>",
+                    Some(values) => {
+                        for (k, v) in values {
+                            s = s + &format!["{}{}: ", prefix, k];
+                            s = s + &*(match v {
+                                Ok(value) => value.pretty_print(indent + 1),
+                                Err(e) => format!["<< Error: {} >>", e],
+                            });
+                            s = s + "\n";
+                        }
+                    },
+                };
 
                 s
             }
 
-            _ => format!["{}", self]
-        }
-    }
-}
-
-impl fmt::Display for Val {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            &Val::Signed(ref i) => write![f, "{}", i],
-            &Val::Unsigned(ref i) => write![f, "{}", i],
-            &Val::String(ref s) => write![f, "{}", s],
-            &Val::Address { ref encoded, .. } => write![f, "{}", encoded],
-
-            &Val::Object(ref values) => {
-                try![write![f, "{{ "]];
-
-                for &(ref k, ref v) in values {
-                    try![write![f, "{}: ", k]];
-
-                    match v {
-                        &Ok(ref value) => try![write![f, "{}", value]],
-                        &Err(ref e) => try![write![f, "<<{}>>", e]],
-                    }
-
-                    try![write![f, ", "]];
-                }
-
-                write![f, "}}"]
-            },
-
-            &Val::Bytes(ref bytes) => {
-                try![write![f, "{} B [", bytes.len()]];
+            Val::Signed(i) => format!["{}", i],
+            Val::Unsigned(i) => format!["{}", i],
+            Val::String(ref s) => format!["{}", s],
+            Val::Address { ref encoded, .. } => format!["{}", encoded],
+            Val::Bytes(ref bytes) => {
+                let mut s = format!["{} B [", bytes.len()];
 
                 let to_print:&[u8] =
                     if bytes.len() < 16 { bytes }
@@ -156,14 +150,14 @@ impl fmt::Display for Val {
                     ;
 
                 for b in to_print {
-                    try![write![f, " {:02x}", b]];
+                    s = s + &format![" {:02x}", b];
                 }
 
                 if bytes.len() > 16 {
-                    try![write![f, " ..."]];
+                    s = s + " ...";
                 }
 
-                write![f, " ]"]
+                s + " ]"
             }
         }
     }
@@ -195,9 +189,6 @@ pub type Result<T=Val> = ::std::result::Result<T,Error>;
 
 /// A named value-or-error.
 pub type NamedValue = (String,Result<Val>);
-
-/// Type of dissection functions.
-pub type Dissector = fn(&[u8]) -> Result<Val>;
 
 /// Little- or big-endian integer representations.
 pub enum Endianness {
@@ -267,11 +258,41 @@ pub fn unsigned(buffer: &[u8], endianness: Endianness) -> Result<u64> {
     }
 }
 
+
 /// Dissector of last resort: store raw bytes without interpretation.
-pub fn raw(data: &[u8]) -> Result {
-    Ok(Val::Object(vec![
-        ("raw data".to_string(), Ok(Val::Bytes(data.to_vec())))
-    ]))
+pub struct RawBytes {
+    short_name: String,
+    full_name: String,
+}
+
+impl RawBytes {
+    /// Convenience function to wrap `String::from` and `Box::new`.
+    fn boxed(short_name: &str, full_name: &str) -> Box<RawBytes> {
+        Box::new(RawBytes {
+            short_name: String::from(short_name),
+            full_name: String::from(full_name),
+        })
+    }
+
+    fn unknown_protocol() -> RawBytes {
+        RawBytes {
+            short_name: String::from("UNKNOWN"),
+            full_name: String::from("Unknown protocol"),
+        }
+    }
+}
+
+impl Protocol for RawBytes {
+    fn short_name(&self) -> &str { &self.short_name }
+    fn full_name(&self) -> &str { &self.full_name }
+
+    fn dissect(&self, data: &[u8]) -> Result {
+        Ok(Val::Protocol(
+            Future::with_value(
+                vec![("raw data".to_string(), Ok(Val::Bytes(data.to_vec())))]
+            )
+        ))
+    }
 }
 
 

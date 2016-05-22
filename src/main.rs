@@ -13,6 +13,7 @@ extern crate rustc_serialize;
 extern crate pcap;
 
 use docopt::Docopt;
+use rshark::Protocol;
 
 
 // TODO: use docopt_macros once rust-lang/rust#28089 is resolved
@@ -56,14 +57,16 @@ fn main() {
         return;
     }
 
+    let protocol = rshark::ethernet::Ethernet;
+
     let result = open_capture(&args)
         .map(|mut c| {
             let mut count = 0;
 
             while let Some(packet) = c.next() {
-                println!("received {}-B packet:", packet.data.len());
+                println!("{}-B packet:", packet.data.len());
 
-                match rshark::ethernet::dissect(packet.data) {
+                match protocol.dissect(packet.data) {
                     Ok(dissected) => print!["{}", dissected.pretty_print(1)],
                     Err(e) => println!["Error: {}", e],
                 }
