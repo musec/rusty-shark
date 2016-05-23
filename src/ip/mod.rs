@@ -89,7 +89,7 @@ impl Protocol for IPv4 {
         let remainder = &data[20..];
         let protocol = match protocol_id {
             // TODO: UDP, TCP, etc.
-            _ => RawBytes::unknown_protocol(),
+            _ => RawBytes::unknown_protocol(&format!["0x{:x}", protocol_id]),
         };
 
         values.push(("Protocol Data".to_string(), protocol.dissect(remainder)));

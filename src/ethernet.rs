@@ -68,12 +68,14 @@ fn dissect_fields(data: &[u8]) -> Vec<NamedValue> {
                 0x8138 => RawBytes::boxed("IPX", "Internetwork Packet Exchange"),
                 0x86dd => RawBytes::boxed("IPv6", "Internet Protocol version 6"),
 
-                _ => Box::new(RawBytes::unknown_protocol()),
+                _ => Box::new(RawBytes::unknown_protocol(&format!["0x{:x}", i])),
             };
 
             let protoname = protocol.short_name().to_string();
+            let description = protocol.full_name().to_string();
+
             values.push(("Type".to_string(), Ok(Val::String(protoname))));
-            values.push(("data".to_string(), protocol.dissect(remainder)));
+            values.push((description, protocol.dissect(remainder)));
         },
         Err(e) => {
             values.push(("Type/length".to_string(), Err(e)));

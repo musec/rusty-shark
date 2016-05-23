@@ -274,10 +274,10 @@ impl RawBytes {
         })
     }
 
-    fn unknown_protocol() -> RawBytes {
+    fn unknown_protocol(description: &str) -> RawBytes {
         RawBytes {
-            short_name: String::from("UNKNOWN"),
-            full_name: String::from("Unknown protocol"),
+            short_name: "UNKNOWN".to_string(),
+            full_name: "Unknown protocol ".to_string() + description,
         }
     }
 }
