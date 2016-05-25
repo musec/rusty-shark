@@ -18,7 +18,6 @@ use {
     Result,
     Val,
     ip,
-    promising_future,
     unsigned,
 };
 
@@ -55,54 +54,41 @@ impl Protocol for Ethernet {
                 message: "An Ethernet frame must be at least 14 B".to_string() })
         }
 
-        // Process fields asynchronously.
-        let (future, promise) = promising_future::future_promise();
+        let mut values:Vec<NamedValue> = vec![];
+        values.push(("Destination".to_string(), mac_address(&data[0..6])));
+        values.push(("Source".to_string(), mac_address(&data[6..12])));
 
-        // TODO: actually process asynchronously!
-        promise.set(dissect_fields(data));
+        // The type/length field might be either a type or a length.
+        let tlen = unsigned(&data[12..14], Endianness::BigEndian);
+        let remainder = &data[14..];
 
-        Ok(Val::Protocol(future))
+        match tlen {
+            Ok(i) if i <= 1500 => {
+                values.push(("Length".to_string(), Ok(Val::Unsigned(i))));
+            },
+
+            Ok(i) => {
+                let protocol: Box<Protocol> = match i {
+                    // TODO: use the simple 'box' syntax once it hits stable
+                    0x800 => Box::new(ip::IPv4),
+                    0x806 => RawBytes::boxed("ARP", "Address Resolution Protocol"),
+                    0x8138 => RawBytes::boxed("IPX", "Internetwork Packet Exchange"),
+                    0x86dd => RawBytes::boxed("IPv6", "Internet Protocol version 6"),
+
+                    _ => Box::new(RawBytes::unknown_protocol(&format!["0x{:x}", i])),
+                };
+
+                let protoname = protocol.short_name().to_string();
+                let description = protocol.full_name().to_string();
+
+                values.push(("Type".to_string(), Ok(Val::String(protoname))));
+                values.push((description, protocol.dissect(remainder)));
+            },
+            Err(e) => {
+                values.push(("Type/length".to_string(), Err(e)));
+            },
+        };
+
+        Ok(Val::Subpacket(values))
     }
 }
-
-
-fn dissect_fields(data: &[u8]) -> Vec<NamedValue> {
-    let mut values:Vec<NamedValue> = vec![];
-    values.push(("Destination".to_string(), mac_address(&data[0..6])));
-    values.push(("Source".to_string(), mac_address(&data[6..12])));
-
-    // The type/length field might be either a type or a length.
-    let tlen = unsigned(&data[12..14], Endianness::BigEndian);
-    let remainder = &data[14..];
-
-    match tlen {
-        Ok(i) if i <= 1500 => {
-            values.push(("Length".to_string(), Ok(Val::Unsigned(i))));
-        },
-
-        Ok(i) => {
-            let protocol: Box<Protocol> = match i {
-                // TODO: use the simple 'box' syntax once it hits stable
-                0x800 => Box::new(ip::IPv4),
-                0x806 => RawBytes::boxed("ARP", "Address Resolution Protocol"),
-                0x8138 => RawBytes::boxed("IPX", "Internetwork Packet Exchange"),
-                0x86dd => RawBytes::boxed("IPv6", "Internet Protocol version 6"),
-
-                _ => Box::new(RawBytes::unknown_protocol(&format!["0x{:x}", i])),
-            };
-
-            let protoname = protocol.short_name().to_string();
-            let description = protocol.full_name().to_string();
-
-            values.push(("Type".to_string(), Ok(Val::String(protoname))));
-            values.push((description, protocol.dissect(remainder)));
-        },
-        Err(e) => {
-            values.push(("Type/length".to_string(), Err(e)));
-        },
-    };
-
-    values
-}
-
-

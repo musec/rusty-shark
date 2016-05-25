@@ -18,7 +18,6 @@
 use {
     Endianness,
     Error,
-    Future,
     NamedValue,
     Protocol,
     RawBytes,
@@ -94,6 +93,6 @@ impl Protocol for IPv4 {
 
         values.push(("Protocol Data".to_string(), protocol.dissect(remainder)));
 
-        Ok(Val::Protocol(Future::with_value(values)))
+        Ok(Val::Subpacket(values))
     }
 }

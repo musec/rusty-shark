@@ -105,8 +105,8 @@ pub enum Val {
     /// A network address, which can have its own special encoding.
     Address { bytes: Vec<u8>, encoded: String },
 
-    /// A protocol can asynchronously parse a subset of this value's bytes.
-    Protocol(Future<Vec<NamedValue>>),
+    /// A set of named values from an encapsulated packet (e.g., TCP within IP).
+    Subpacket(Vec<NamedValue>),
 
     /// Raw bytes, e.g., a checksum or just unparsed data.
     Bytes(Vec<u8>),
@@ -115,23 +115,18 @@ pub enum Val {
 impl Val {
     pub fn pretty_print(self, indent:usize) -> String {
         match self {
-            Val::Protocol(future) => {
+            Val::Subpacket(values) => {
                 let mut s = "\n".to_string();
                 let prefix =
                     ::std::iter::repeat(" ").take(2 * indent).collect::<String>();
 
-                match future.value() {
-                    None => s = s + "<<Error: values not parsed>>",
-                    Some(values) => {
-                        for (k, v) in values {
-                            s = s + &format!["{}{}: ", prefix, k];
-                            s = s + &*(match v {
-                                Ok(value) => value.pretty_print(indent + 1),
-                                Err(e) => format!["<< Error: {} >>", e],
-                            });
-                            s = s + "\n";
-                        }
-                    },
+                for (k, v) in values {
+                    s = s + &format!["{}{}: ", prefix, k];
+                    s = s + &*(match v {
+                        Ok(value) => value.pretty_print(indent + 1),
+                        Err(e) => format!["<< Error: {} >>", e],
+                    });
+                    s = s + "\n";
                 };
 
                 s
@@ -287,10 +282,8 @@ impl Protocol for RawBytes {
     fn full_name(&self) -> &str { &self.full_name }
 
     fn dissect(&self, data: &[u8]) -> Result {
-        Ok(Val::Protocol(
-            Future::with_value(
-                vec![("raw data".to_string(), Ok(Val::Bytes(data.to_vec())))]
-            )
+        Ok(Val::Subpacket(
+            vec![("raw data".to_string(), Ok(Val::Bytes(data.to_vec())))]
         ))
     }
 }
