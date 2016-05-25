@@ -89,7 +89,6 @@ pub trait Protocol {
 /// Wireshark replacement just yet. Additional needs include:
 ///
 ///  * tracking original bytes (by reference or by index?)
-///  * supporting error metadata (e.g., "parsed ok but checksum doesn't match")
 ///
 #[derive(Debug)]
 pub enum Val {
@@ -110,6 +109,12 @@ pub enum Val {
 
     /// Raw bytes, e.g., a checksum or just unparsed data.
     Bytes(Vec<u8>),
+
+    /// An error that stopped further parsing.
+    Error(Error),
+
+    /// A problem with a packet that did not stop further parsing (e.g., bad checksum).
+    Warning(Error),
 }
 
 impl Val {
@@ -153,7 +158,9 @@ impl Val {
                 }
 
                 s + " ]"
-            }
+            },
+            Val::Warning(w) => format!["Warning: {}", w],
+            Val::Error(e) => format!["Error: {}", e],
         }
     }
 }
