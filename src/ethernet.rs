@@ -26,6 +26,26 @@ use {
 /// The IEEE 802.3 Ethernet protocol.
 pub struct Ethernet;
 
+
+/// Parse a six-byte MAC address, which can be encoded as, e.g., ff:ff:ff:ff:ff:ff.
+pub fn mac_address(raw: &[u8]) -> Result<Val> {
+    if raw.len() != 6 {
+        return Err(Error::InvalidData(format!["MAC address should have 6 B, not {}",
+                                              raw.len()]));
+    }
+
+    let encoded = raw
+                  .iter()
+                  .map(|b| format!["{:02x}", b])
+                  .collect::<Vec<String>>()
+                  .join(":")
+                  ;
+
+
+    Ok(Val::Address { bytes: raw.to_vec(), encoded: encoded })
+}
+
+
 impl Protocol for Ethernet {
     fn short_name(&self) -> &str { "Ethernet" }
     fn full_name(&self) -> &str { "IEEE 802.3 Ethernet" }
@@ -48,8 +68,8 @@ impl Protocol for Ethernet {
 
 fn dissect_fields(data: &[u8]) -> Vec<NamedValue> {
     let mut values:Vec<NamedValue> = vec![];
-    values.push(("Destination".to_string(), Ok(Val::Bytes(data[0..6].to_vec()))));
-    values.push(("Source".to_string(), Ok(Val::Bytes(data[6..12].to_vec()))));
+    values.push(("Destination".to_string(), mac_address(&data[0..6])));
+    values.push(("Source".to_string(), mac_address(&data[6..12])));
 
     // The type/length field might be either a type or a length.
     let tlen = unsigned(&data[12..14], Endianness::BigEndian);
@@ -84,3 +104,5 @@ fn dissect_fields(data: &[u8]) -> Vec<NamedValue> {
 
     values
 }
+
+
