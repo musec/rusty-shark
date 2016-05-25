@@ -98,6 +98,9 @@ pub enum Val {
     /// An unsigned integer, in machine-native representation.
     Unsigned(u64),
 
+    /// An integer value that represents a symbolic value.
+    Enum(u64, String),
+
     /// A UTF-8–encoded string.
     String(String),
 
@@ -139,6 +142,7 @@ impl Val {
 
             Val::Signed(i) => format!["{}", i],
             Val::Unsigned(i) => format!["{}", i],
+            Val::Enum(i, s) => format!["{} ({})", i, s],
             Val::String(ref s) => format!["{}", s],
             Val::Address { ref encoded, .. } => format!["{}", encoded],
             Val::Bytes(ref bytes) => {

@@ -83,7 +83,7 @@ impl Protocol for Ethernet {
                 let protoname = protocol.short_name().to_string();
                 let description = protocol.full_name().to_string();
 
-                values.push(("Type".to_string(), Ok(Val::String(protoname))));
+                values.push(("Type".to_string(), Ok(Val::Enum(i, protoname))));
                 values.push((description, protocol.dissect(remainder)));
             },
             Err(e) => {

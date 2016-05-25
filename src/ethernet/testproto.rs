@@ -66,7 +66,8 @@ impl <'a> TestMessage <'a> {
         let val = match self {
             TestMessage::Reply{ receipt_number, data } =>
                 vec![
-                    ("Function Code".to_string(), Ok(Val::Unsigned(1))),
+                    ("Function Code".to_string(),
+                        Ok(Val::Enum(1, "Reply Message".to_string()))),
                     ("Receipt Number".to_string(), receipt_number.map(Val::Unsigned)),
                     ("Data".to_string(), Ok(Val::Bytes(data.to_vec()))),
                 ],
@@ -78,7 +79,8 @@ impl <'a> TestMessage <'a> {
                 };
 
                 vec![
-                    ("Function Code".to_string(), Ok(Val::Unsigned(2))),
+                    ("Function Code".to_string(),
+                        Ok(Val::Enum(2, "Forward Data Message".to_string()))),
                     ("Forward Address".to_string(), dest),
                     ("Data".to_string(), data),
                 ]

@@ -65,8 +65,13 @@ impl Protocol for IPv4 {
         values.push(("Identification".to_string(), Ok(Val::Unsigned(data[8] as u64))));
 
         // Protocol number (assigned by IANA)
-        let protocol_id = data[9];
-        values.push(("Protocol".to_string(), Ok(Val::Unsigned(protocol_id as u64))));
+        let proto_id = data[9] as u64;
+        let protocol = match proto_id {
+            // TODO: UDP, TCP, etc.
+            _ => RawBytes::unknown_protocol(&format!["0x{:x}", proto_id]),
+        };
+        let protoname:String = protocol.short_name().to_string();
+        values.push(("Protocol".to_string(), Ok(Val::Enum(proto_id, protoname))));
 
         // Header checksum
         values.push(("Checksum".to_string(), Ok(Val::Bytes(data[10..12].to_vec()))));
@@ -86,11 +91,6 @@ impl Protocol for IPv4 {
 
         // Parse the remainder according to the specified protocol.
         let remainder = &data[20..];
-        let protocol = match protocol_id {
-            // TODO: UDP, TCP, etc.
-            _ => RawBytes::unknown_protocol(&format!["0x{:x}", protocol_id]),
-        };
-
         values.push(("Protocol Data".to_string(), protocol.dissect(remainder)));
 
         Ok(Val::Subpacket(values))
