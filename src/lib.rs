@@ -165,7 +165,7 @@ impl Val {
 
 
 /// An error related to packet dissection (underflow, bad value, etc.).
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum Error {
     Underflow { expected: usize, have: usize, message: String, },
     InvalidData(String),
