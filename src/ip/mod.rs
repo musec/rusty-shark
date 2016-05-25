@@ -59,7 +59,7 @@ impl Protocol for IPv4 {
 
         // Total length (including header)
         let length = unsigned(&data[2..4], Endianness::BigEndian);
-        values.push(("Length".to_string(), length.map(|v| Val::Unsigned(v))));
+        values.push(("Length".to_string(), length.map(Val::Unsigned)));
 
         // Identification (of datagraph fragments): RFC 6864
         values.push(("Identification".to_string(), Ok(Val::Unsigned(data[8] as u64))));
