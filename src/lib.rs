@@ -121,23 +121,21 @@ pub enum Val {
 }
 
 impl Val {
-    pub fn pretty_print(self, indent:usize) -> String {
+    pub fn pretty_print(self, indent_level:usize) -> String {
         match self {
             Val::Subpacket(values) => {
-                let mut s = "\n".to_string();
-                let prefix =
-                    ::std::iter::repeat(" ").take(2 * indent).collect::<String>();
+                let indent:String = std::iter::repeat(" ").take(2 * indent_level).collect();
 
-                for (k, v) in values {
-                    s = s + &format!["{}{}: ", prefix, k];
-                    s = s + &*(match v {
-                        Ok(value) => value.pretty_print(indent + 1),
-                        Err(e) => format!["<< Error: {} >>", e],
-                    });
-                    s = s + "\n";
-                };
-
-                s
+                "\n".to_string() + &values.into_iter()
+                    .map(|(k,v)| {
+                        format!["{}{}: ", indent, k]
+                        + &match v {
+                            Ok(val) => val.pretty_print(indent_level + 1),
+                            Err(e) => format!["<< Error: {} >>", e],
+                        }
+                    })
+                    .collect::<Vec<String>>()
+                    .join("\n")
             }
 
             Val::Signed(i) => format!["{}", i],

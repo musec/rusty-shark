@@ -64,7 +64,7 @@ fn main() {
             let mut count = 0;
 
             while let Ok(packet) = c.next() {
-                println!("{}-B packet:", packet.data.len());
+                println!("\n\n{}-B packet:", packet.data.len());
 
                 match protocol.dissect(packet.data) {
                     Ok(dissected) => print!["{}", dissected.pretty_print(1)],
