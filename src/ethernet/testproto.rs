@@ -10,7 +10,6 @@
 //! Dissection of the test protocol from the Xerox Blue Book (but not IEEE 802.3).
 
 use {
-    Endianness,
     Error,
     NamedValue,
     Protocol,
@@ -20,6 +19,8 @@ use {
     unsigned,
 };
 
+use byteorder::*;
+
 
 /// Testing protocol from the Xerox Blue Book.
 ///
@@ -28,7 +29,7 @@ use {
 pub struct TestProtocol;
 
 enum TestMessage<'a> {
-    Reply { receipt_number: Result<u64>, data: &'a [u8] },
+    Reply { receipt_number: Result<u16>, data: &'a [u8] },
     ForwardData { dest: Result<Val>, message: Result<Box<TestMessage<'a>>> },
 }
 
@@ -38,7 +39,7 @@ impl Protocol for TestProtocol {
     fn dissect(&self, data: &[u8]) -> Result {
         let mut values:Vec<NamedValue> = vec![];
 
-        let skip_count = unsigned(&data[0..2], Endianness::BigEndian);
+        let skip_count = unsigned::<u64, NetworkEndian>(&data[0..2]);
         values.push(("Skip count".to_string(), skip_count.map(Val::Unsigned)));
 
         let top_message =
@@ -68,7 +69,7 @@ impl <'a> TestMessage <'a> {
                 vec![
                     ("Function Code".to_string(),
                         Ok(Val::Enum(1, "Reply Message".to_string()))),
-                    ("Receipt Number".to_string(), receipt_number.map(Val::Unsigned)),
+                    ("Receipt Number".to_string(), receipt_number.and_then(Val::unsigned)),
                     ("Data".to_string(), Ok(Val::Bytes(data.to_vec()))),
                 ],
 
@@ -91,10 +92,10 @@ impl <'a> TestMessage <'a> {
     }
 
     fn parse(data: &[u8]) -> Result<TestMessage> {
-        let function_code = unsigned(&data[0..2], Endianness::LittleEndian);
+        let function_code = unsigned::<u16, LittleEndian>(&data[0..2]);
         match function_code {
             Ok(1) => Ok({
-                let receipt_number = unsigned(&data[2..4], Endianness::LittleEndian);
+                let receipt_number = unsigned::<u16, LittleEndian>(&data[2..4]);
 
                 TestMessage::Reply{
                     receipt_number: receipt_number,

@@ -16,7 +16,6 @@
 //! See [RFC 791](https://tools.ietf.org/html/rfc791).
 
 use {
-    Endianness,
     Error,
     NamedValue,
     Protocol,
@@ -25,6 +24,8 @@ use {
     Val,
     unsigned,
 };
+
+use byteorder::*;
 
 
 pub struct IPv4;
@@ -58,8 +59,8 @@ impl Protocol for IPv4 {
         values.push(("ECN".to_string(), Ok(Val::Unsigned(ecn as u64))));
 
         // Total length (including header)
-        let length = unsigned(&data[2..4], Endianness::BigEndian);
-        values.push(("Length".to_string(), length.map(Val::Unsigned)));
+        let length = unsigned::<u16, NetworkEndian>(&data[2..4]);
+        values.push(("Length".to_string(), length.and_then(Val::unsigned)));
 
         // Identification (of datagraph fragments): RFC 6864
         values.push(("Identification".to_string(), Ok(Val::Unsigned(data[8] as u64))));

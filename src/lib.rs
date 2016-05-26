@@ -61,12 +61,12 @@
 #![doc(html_logo_url = "https://raw.githubusercontent.com/musec/rusty-shark/master/artwork/wordmark.png")]
 
 extern crate byteorder;
+extern crate num;
 extern crate promising_future;
 
-use byteorder::ReadBytesExt;
+use byteorder::ByteOrder;
 pub use promising_future::Future;
 use std::fmt;
-use std::io;
 
 
 /// A description of a protocol, including code that can parse it.
@@ -121,6 +121,14 @@ pub enum Val {
 }
 
 impl Val {
+    pub fn unsigned<T>(x: T) -> Result<Val>
+        where T: num::ToPrimitive + std::fmt::Display
+    {
+        x.to_u64()
+         .map(Val::Unsigned)
+         .ok_or(Error::InvalidData(format!["Cannot convert {} to u64", x]))
+    }
+
     pub fn pretty_print(self, indent_level:usize) -> String {
         match self {
             Val::Subpacket(values) => {
@@ -194,72 +202,47 @@ pub type Result<T=Val> = ::std::result::Result<T,Error>;
 /// A named value-or-error.
 pub type NamedValue = (String,Result<Val>);
 
-/// Little- or big-endian integer representations.
-pub enum Endianness {
-    BigEndian,
-    LittleEndian,
-}
 
 /// Parse a signed integer of a given endianness from a byte buffer.
 ///
 /// The size of the buffer will be used to determine the size of the integer
-/// that should be parsed (i8, i16, i32 or i64), but the result will be stored
-/// in an i64.
-pub fn signed(buffer: &[u8], endianness: Endianness) -> Result<i64> {
-    let mut reader = io::Cursor::new(buffer);
+/// that should be parsed (i8, i16, i32 or i64).
+pub fn signed<T, E>(buffer: &[u8]) -> Result<T>
+    where T: num::FromPrimitive, E: ByteOrder
+{
+    let len = buffer.len();
+    let conversion_error = "Failed to convert integer";
 
-    match endianness {
-        Endianness::BigEndian => {
-            match buffer.len() {
-                1 => Ok(buffer[0] as i64),
-                2 => Ok(reader.read_i16::<byteorder::BigEndian>().unwrap() as i64),
-                4 => Ok(reader.read_i32::<byteorder::BigEndian>().unwrap() as i64),
-                8 => Ok(reader.read_i64::<byteorder::BigEndian>().unwrap()),
-                x => Err(Error::InvalidData(format!["Invalid integer size: {} B", x])),
-            }
-        }
-
-        Endianness::LittleEndian => {
-            match buffer.len() {
-                1 => Ok(buffer[0] as i64),
-                2 => Ok(reader.read_i16::<byteorder::LittleEndian>().unwrap() as i64),
-                4 => Ok(reader.read_i32::<byteorder::LittleEndian>().unwrap() as i64),
-                8 => Ok(reader.read_i64::<byteorder::LittleEndian>().unwrap()),
-                x => Err(Error::InvalidData(format!["Invalid integer size: {} B", x])),
-            }
-        }
+    match len {
+        1 => T::from_u8(buffer[0]).ok_or(conversion_error),
+        2 => T::from_i16(E::read_i16(buffer)).ok_or(conversion_error),
+        4 => T::from_i32(E::read_i32(buffer)).ok_or(conversion_error),
+        8 => T::from_i64(E::read_i64(buffer)).ok_or(conversion_error),
+        _ => Err("Invalid integer size"),
     }
+    .map_err(|s| format!["{} ({} B)", s, len])
+    .map_err(Error::InvalidData)
 }
 
-/// Parse a signed integer of a given endianness from a byte buffer.
+/// Parse an unsigned integer of a given endianness from a byte buffer.
 ///
 /// The size of the buffer will be used to determine the size of the integer
-/// that should be parsed (u8, u16, u32 or u64), but the result will be stored
-/// in a u64.
-pub fn unsigned(buffer: &[u8], endianness: Endianness) -> Result<u64> {
-    let mut reader = io::Cursor::new(buffer);
+/// that should be parsed (u8, u16, u32 or u64).
+pub fn unsigned<T, E>(buffer: &[u8]) -> Result<T>
+    where T: num::FromPrimitive, E: ByteOrder
+{
+    let len = buffer.len();
+    let conversion_error = "Failed to convert {} B integer";
 
-    match endianness {
-        Endianness::BigEndian => {
-            match buffer.len() {
-                1 => Ok(buffer[0] as u64),
-                2 => Ok(reader.read_u16::<byteorder::BigEndian>().unwrap() as u64),
-                4 => Ok(reader.read_u32::<byteorder::BigEndian>().unwrap() as u64),
-                8 => Ok(reader.read_u64::<byteorder::BigEndian>().unwrap()),
-                x => Err(Error::InvalidData(format!["Invalid integer size: {} B", x])),
-            }
-        }
-
-        Endianness::LittleEndian => {
-            match buffer.len() {
-                1 => Ok(buffer[0] as u64),
-                2 => Ok(reader.read_u16::<byteorder::LittleEndian>().unwrap() as u64),
-                4 => Ok(reader.read_u32::<byteorder::LittleEndian>().unwrap() as u64),
-                8 => Ok(reader.read_u64::<byteorder::LittleEndian>().unwrap()),
-                x => Err(Error::InvalidData(format!["Invalid integer size: {} B", x])),
-            }
-        }
+    match len {
+        1 => T::from_u8(buffer[0]).ok_or(conversion_error),
+        2 => T::from_u16(E::read_u16(buffer)).ok_or(conversion_error),
+        4 => T::from_u32(E::read_u32(buffer)).ok_or(conversion_error),
+        8 => T::from_u64(E::read_u64(buffer)).ok_or(conversion_error),
+        _ => Err("Invalid integer size: {}"),
     }
+    .map_err(|s| format!["{} ({} B)", s, len])
+    .map_err(Error::InvalidData)
 }
 
 

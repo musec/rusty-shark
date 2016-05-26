@@ -10,7 +10,6 @@
 //! Dissection of Ethernet (IEEE 802.3) frames.
 
 use {
-    Endianness,
     Error,
     NamedValue,
     Protocol,
@@ -20,6 +19,8 @@ use {
     ip,
     unsigned,
 };
+
+use byteorder::*;
 
 
 /// The IEEE 802.3 Ethernet protocol.
@@ -59,12 +60,12 @@ impl Protocol for Ethernet {
         values.push(("Source".to_string(), mac_address(&data[6..12])));
 
         // The type/length field might be either a type or a length.
-        let tlen = unsigned(&data[12..14], Endianness::BigEndian);
+        let tlen = unsigned::<u16,NetworkEndian>(&data[12..14]);
         let remainder = &data[14..];
 
         match tlen {
             Ok(i) if i <= 1500 => {
-                values.push(("Length".to_string(), Ok(Val::Unsigned(i))));
+                values.push(("Length".to_string(), Ok(Val::Unsigned(i as u64))));
             },
 
             Ok(i) => {
@@ -83,7 +84,7 @@ impl Protocol for Ethernet {
                 let protoname = protocol.short_name().to_string();
                 let description = protocol.full_name().to_string();
 
-                values.push(("Type".to_string(), Ok(Val::Enum(i, protoname))));
+                values.push(("Type".to_string(), Ok(Val::Enum(i as u64, protoname))));
                 values.push((description, protocol.dissect(remainder)));
             },
             Err(e) => {
