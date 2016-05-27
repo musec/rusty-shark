@@ -110,7 +110,7 @@ impl <'a> TestMessage <'a> {
                 }
             }),
 
-            Ok(x) => Err(Error::InvalidData(format!["invalid function code: {}", x])),
+            Ok(x) => Error::inval(format!["invalid function code: {}", x]),
             Err(e) => Err(e),
         }
     }

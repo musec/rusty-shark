@@ -30,8 +30,7 @@ pub struct Ethernet;
 /// Parse a six-byte MAC address, which can be encoded as, e.g., ff:ff:ff:ff:ff:ff.
 pub fn mac_address(raw: &[u8]) -> Result<Val> {
     if raw.len() != 6 {
-        return Err(Error::InvalidData(format!["MAC address should have 6 B, not {}",
-                                              raw.len()]));
+        return Error::inval(format!["MAC address should have 6 B, not {}", raw.len()]);
     }
 
     let encoded = raw
@@ -51,8 +50,7 @@ impl Protocol for Ethernet {
     fn full_name(&self) -> &str { "IEEE 802.3 Ethernet" }
     fn dissect(&self, data: &[u8]) -> Result {
         if data.len() < 14 {
-            return Err(Error::Underflow { expected: 14, have: data.len(),
-                message: "An Ethernet frame must be at least 14 B".to_string() })
+            return Error::underflow(14, data.len(), "Ethernet frame")
         }
 
         let mut values:Vec<NamedValue> = vec![];

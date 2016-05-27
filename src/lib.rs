@@ -148,6 +148,12 @@ impl Val {
          .ok_or(Error::InvalidData(format!["Cannot convert {} to u64", x]))
     }
 
+    pub fn str<Str>(s: Str) -> Val
+        where Str: Into<String>
+    {
+        Val::String(s.into())
+    }
+
     pub fn pretty_print(self, indent_level:usize) -> String {
         match self {
             Val::Subpacket(values) => {
@@ -204,16 +210,30 @@ impl Val {
 /// An error related to packet dissection (underflow, bad value, etc.).
 #[derive(Clone, Debug)]
 pub enum Error {
-    Underflow { expected: usize, have: usize, message: String, },
+    Underflow { expected: usize, have: usize, subject: String, },
     InvalidData(String),
+}
+
+impl Error
+{
+    fn underflow<T,S>(expected: usize, have: usize, subject: S) -> Result<T>
+        where S: Into<String>
+    {
+        Err(Error::Underflow { expected: expected, have: have, subject: subject.into() })
+    }
+
+    fn inval<T,S>(message: S) -> Result<T>
+        where S: Into<String>
+    {
+        Err(Error::InvalidData(message.into()))
+    }
 }
 
 impl fmt::Display for Error {
     fn fmt(&self, f : &mut fmt::Formatter) -> fmt::Result {
         match self {
-            &Error::Underflow { expected, have, ref message } =>
-                write![f, "underflow (expected {}, have {}): {}",
-                    expected, have, message],
+            &Error::Underflow { expected: expect, have, ref subject } =>
+                write![f, "underflow: {} expected {} B, have {}", subject, expect, have],
 
             &Error::InvalidData(ref msg) => write![f, "invalid data: {}", msg],
         }
@@ -279,10 +299,12 @@ pub struct RawBytes {
 
 impl RawBytes {
     /// Convenience function to wrap `String::from` and `Box::new`.
-    fn boxed(short_name: &str, full_name: &str) -> Box<RawBytes> {
+    fn boxed<Str>(short_name: Str, full_name: Str) -> Box<RawBytes>
+        where Str: Into<String>
+    {
         Box::new(RawBytes {
-            short_name: String::from(short_name),
-            full_name: String::from(full_name),
+            short_name: short_name.into(),
+            full_name: full_name.into(),
         })
     }
 

@@ -36,8 +36,7 @@ impl Protocol for IPv4 {
 
     fn dissect(&self, data : &[u8]) -> Result {
         if data.len() < 20 {
-            return Err(Error::Underflow { expected: 20, have: data.len(),
-                message: "An IP packet must be at least 20 B".to_string() })
+            return Error::underflow(20, data.len(), "IP packet")
         }
 
         let mut values:Vec<NamedValue> = vec![];
