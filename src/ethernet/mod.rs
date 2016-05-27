@@ -66,6 +66,12 @@ impl Protocol for Ethernet {
         match tlen {
             Ok(i) if i <= 1500 => {
                 values.push(("Length".to_string(), Val::base10(i)));
+
+                let index = i as usize;
+                let packet_data = remainder[..index].to_vec();
+                let padding = remainder[index..].to_vec();
+                values.push(("Data".to_string(), Ok(Val::Bytes(packet_data))));
+                values.push(("Padding".to_string(), Ok(Val::Bytes(padding))));
             },
 
             Ok(i) => {
