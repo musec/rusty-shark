@@ -65,7 +65,7 @@ impl Protocol for Ethernet {
 
         match tlen {
             Ok(i) if i <= 1500 => {
-                values.push(("Length".to_string(), Ok(Val::Unsigned(i as u64))));
+                values.push(("Length".to_string(), Val::base10(i)));
             },
 
             Ok(i) => {

@@ -95,8 +95,9 @@ pub enum Val {
     /// A signed integer, in machine-native representation.
     Signed(i64),
 
-    /// An unsigned integer, in machine-native representation.
-    Unsigned(u64),
+    /// An unsigned integer, in machine-native representation, and a radix (base) for
+    /// when we display the value to the user (e.g., 0x100 vs 256).
+    Unsigned { value: u64, radix: u8 },
 
     /// An integer value that represents a symbolic value.
     Enum(u64, String),
@@ -121,11 +122,29 @@ pub enum Val {
 }
 
 impl Val {
-    pub fn unsigned<T>(x: T) -> Result<Val>
+    pub fn base2<T>(x: T) -> Result<Val>
+        where T: num::ToPrimitive + std::fmt::Display
+    {
+        Val::unsigned(x, 2)
+    }
+
+    pub fn base10<T>(x: T) -> Result<Val>
+        where T: num::ToPrimitive + std::fmt::Display
+    {
+        Val::unsigned(x, 10)
+    }
+
+    pub fn base16<T>(x: T) -> Result<Val>
+        where T: num::ToPrimitive + std::fmt::Display
+    {
+        Val::unsigned(x, 16)
+    }
+
+    pub fn unsigned<T>(x: T, radix:u8) -> Result<Val>
         where T: num::ToPrimitive + std::fmt::Display
     {
         x.to_u64()
-         .map(Val::Unsigned)
+         .map(|value| Val::Unsigned { value: value, radix: radix })
          .ok_or(Error::InvalidData(format!["Cannot convert {} to u64", x]))
     }
 
@@ -147,7 +166,13 @@ impl Val {
             }
 
             Val::Signed(i) => format!["{}", i],
-            Val::Unsigned(i) => format!["{}", i],
+            Val::Unsigned { value, radix } => match radix {
+                2 => format!["{:b}", value],
+                8 => format!["{:o}", value],
+                10 => format!["{}", value],
+                16 => format!["{:x}", value],
+                _ => format!["{:?} (base {})", value, radix],
+            },
             Val::Enum(i, s) => format!["{} ({})", i, s],
             Val::String(ref s) => format!["{}", s],
             Val::Address { ref encoded, .. } => format!["{}", encoded],

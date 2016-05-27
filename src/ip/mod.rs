@@ -44,26 +44,26 @@ impl Protocol for IPv4 {
 
         // IP version (should be "4")
         let version = data[0] >> 4;
-        values.push(("Version".to_string(), Ok(Val::Unsigned(version as u64))));
+        values.push(("Version".to_string(), Val::base10(version)));
 
         // Internet Header Length (IHL): number of 32b words in header
         let words = data[0] & 0x0f;
-        values.push(("IHL".to_string(), Ok(Val::Unsigned(words as u64))));
+        values.push(("IHL".to_string(), Val::base10(words)));
 
         // Differentiated Services Code Point (DSCP): RFC 2474
         let dscp = data[1] >> 2;
-        values.push(("DSCP".to_string(), Ok(Val::Unsigned(dscp as u64))));
+        values.push(("DSCP".to_string(), Val::base16(dscp)));
 
         // Explicit Congestion Notification (ECN): RFC 3168
         let ecn = data[1] & 0x03;
-        values.push(("ECN".to_string(), Ok(Val::Unsigned(ecn as u64))));
+        values.push(("ECN".to_string(), Val::base2(ecn)));
 
         // Total length (including header)
         let length = unsigned::<u16, NetworkEndian>(&data[2..4]);
-        values.push(("Length".to_string(), length.and_then(Val::unsigned)));
+        values.push(("Length".to_string(), length.and_then(Val::base10)));
 
         // Identification (of datagraph fragments): RFC 6864
-        values.push(("Identification".to_string(), Ok(Val::Unsigned(data[8] as u64))));
+        values.push(("Identification".to_string(), Val::base10(data[8])));
 
         // Protocol number (assigned by IANA)
         let proto_id = data[9] as u64;

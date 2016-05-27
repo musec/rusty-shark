@@ -40,7 +40,7 @@ impl Protocol for TestProtocol {
         let mut values:Vec<NamedValue> = vec![];
 
         let skip_count = unsigned::<u64, NetworkEndian>(&data[0..2]);
-        values.push(("Skip count".to_string(), skip_count.map(Val::Unsigned)));
+        values.push(("Skip count".to_string(), skip_count.and_then(Val::base10)));
 
         let top_message =
             TestMessage::parse(&data[2..])
@@ -69,7 +69,7 @@ impl <'a> TestMessage <'a> {
                 vec![
                     ("Function Code".to_string(),
                         Ok(Val::Enum(1, "Reply Message".to_string()))),
-                    ("Receipt Number".to_string(), receipt_number.and_then(Val::unsigned)),
+                    ("Receipt Number".to_string(), receipt_number.and_then(Val::base10)),
                     ("Data".to_string(), Ok(Val::Bytes(data.to_vec()))),
                 ],
 

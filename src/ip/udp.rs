@@ -41,10 +41,10 @@ impl Protocol for UDP {
         };
 
         let values = vec![
-                ("Source port", source.and_then(Val::unsigned)),
-                ("Destination port", dest.and_then(Val::unsigned)),
-                ("Length", length.and_then(Val::unsigned)),
-                ("Checksum", checksum.and_then(Val::unsigned)),
+                ("Source port", source.and_then(Val::base10)),
+                ("Destination port", dest.and_then(Val::base10)),
+                ("Length", length.and_then(Val::base10)),
+                ("Checksum", checksum.and_then(Val::base16)),
                 ("Data", protocol.dissect(&data[8..])),
             ]
             .into_iter()
