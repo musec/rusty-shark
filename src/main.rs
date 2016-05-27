@@ -100,6 +100,7 @@ fn open_capture(args: &Args) -> PcapResult {
 
     capture.and_then(|mut c| {
         try![c.filter(&args.flag_filter)];
+        println!["Opened packet source: {}", args.arg_source];
         Ok(c)
     })
 }
