@@ -261,11 +261,11 @@ impl RawBytes {
         })
     }
 
-    fn unknown_protocol(description: &str) -> RawBytes {
-        RawBytes {
+    fn unknown_protocol(description: &str) -> Box<RawBytes> {
+        Box::new(RawBytes {
             short_name: "UNKNOWN".to_string(),
             full_name: "Unknown protocol ".to_string() + description,
-        }
+        })
     }
 }
 

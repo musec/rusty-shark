@@ -67,7 +67,7 @@ impl Protocol for IPv4 {
 
         // Protocol number (assigned by IANA)
         let proto_id = data[9] as u64;
-        let protocol = match proto_id {
+        let protocol:Box<Protocol> = match proto_id {
             // TODO: UDP, TCP, etc.
             _ => RawBytes::unknown_protocol(&format!["0x{:x}", proto_id]),
         };

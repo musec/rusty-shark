@@ -78,7 +78,7 @@ impl Protocol for Ethernet {
 
                     0x9000 => Box::new(testproto::TestProtocol),
 
-                    _ => Box::new(RawBytes::unknown_protocol(&format!["0x{:x}", i])),
+                    _ => RawBytes::unknown_protocol(&format!["0x{:x}", i]),
                 };
 
                 let protoname = protocol.short_name().to_string();
