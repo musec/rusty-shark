@@ -72,10 +72,10 @@ use std::fmt;
 /// A description of a protocol, including code that can parse it.
 pub trait Protocol {
     /// A short name that can fit in a user display, e.g., "IPv6".
-    fn short_name(&self) -> &str;
+    fn short_name(&self) -> &'static str;
 
     /// A complete, unambigous protocol name, e.g., "Internet Protocol version 6"
-    fn full_name(&self) -> &str;
+    fn full_name(&self) -> &'static str;
 
     /// A function to dissect some bytes according to the protocol.
     fn dissect(&self, &[u8]) -> Result;
@@ -100,7 +100,7 @@ pub enum Val {
     Unsigned { value: u64, radix: u8 },
 
     /// An integer value that represents a symbolic value.
-    Enum(u64, String),
+    Enum(u64, &'static str),
 
     /// A UTF-8–encoded string.
     String(String),
@@ -245,7 +245,7 @@ pub type Result<T=Val> = ::std::result::Result<T,Error>;
 
 
 /// A named value-or-error.
-pub type NamedValue = (String,Result<Val>);
+pub type NamedValue = (&'static str,Result<Val>);
 
 
 /// Parse a signed integer of a given endianness from a byte buffer.
@@ -293,36 +293,35 @@ pub fn unsigned<T, E>(buffer: &[u8]) -> Result<T>
 
 /// Dissector of last resort: store raw bytes without interpretation.
 pub struct RawBytes {
-    short_name: String,
-    full_name: String,
+    short_name: &'static str,
+    full_name: &'static str,
 }
 
 impl RawBytes {
     /// Convenience function to wrap `String::from` and `Box::new`.
-    fn boxed<Str>(short_name: Str, full_name: Str) -> Box<RawBytes>
-        where Str: Into<String>
+    fn boxed(short_name: &'static str, full_name: &'static str) -> Box<RawBytes>
     {
         Box::new(RawBytes {
-            short_name: short_name.into(),
-            full_name: full_name.into(),
+            short_name: short_name,
+            full_name: full_name,
         })
     }
 
-    fn unknown_protocol(description: &str) -> Box<RawBytes> {
+    fn unknown_protocol(description: &'static str) -> Box<RawBytes> {
         Box::new(RawBytes {
-            short_name: "UNKNOWN".to_string(),
-            full_name: "Unknown protocol ".to_string() + description,
+            short_name: "UNKNOWN",
+            full_name: description,
         })
     }
 }
 
 impl Protocol for RawBytes {
-    fn short_name(&self) -> &str { &self.short_name }
-    fn full_name(&self) -> &str { &self.full_name }
+    fn short_name(&self) -> &'static str { self.short_name }
+    fn full_name(&self) -> &'static str { self.full_name }
 
     fn dissect(&self, data: &[u8]) -> Result {
         Ok(Val::Subpacket(
-            vec![("raw data".to_string(), Ok(Val::Bytes(data.to_vec())))]
+            vec![("raw data", Ok(Val::Bytes(data.to_vec())))]
         ))
     }
 }

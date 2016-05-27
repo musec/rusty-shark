@@ -26,8 +26,8 @@ use byteorder::NetworkEndian;
 pub struct UDP;
 
 impl Protocol for UDP {
-    fn short_name(&self) -> &str { "UDP" }
-    fn full_name(&self) -> &str { "User Datagram Protocol" }
+    fn short_name(&self) -> &'static str { "UDP" }
+    fn full_name(&self) -> &'static str { "User Datagram Protocol" }
 
     fn dissect(&self, data : &[u8]) -> Result {
         let source = unsigned::<u16, NetworkEndian>(&data[0..2]);
@@ -36,8 +36,8 @@ impl Protocol for UDP {
         let checksum = unsigned::<u16, NetworkEndian>(&data[6..8]);
 
         let protocol = match (&source,&dest) {
-            (&Ok(s), &Ok(d)) => RawBytes::boxed("UNKNOWN", &format!["UDP: {} -> {}", s, d]),
-            _ => RawBytes::unknown_protocol("unknown UDP protocol or UDP error"),
+            (&Ok(_), &Ok(_)) => RawBytes::boxed("UNKNOWN", "unknown UDP protocol"),
+            _ => RawBytes::unknown_protocol("UDP error"),
         };
 
         let values = vec![
@@ -47,9 +47,6 @@ impl Protocol for UDP {
                 ("Checksum", checksum.and_then(Val::base16)),
                 ("Data", protocol.dissect(&data[8..])),
             ]
-            .into_iter()
-            .map(|(k,v)| (k.to_string(), v))
-            .collect()
             ;
 
         Ok(Val::Subpacket(values))

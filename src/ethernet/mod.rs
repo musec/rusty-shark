@@ -46,16 +46,16 @@ pub fn mac_address(raw: &[u8]) -> Result<Val> {
 
 
 impl Protocol for Ethernet {
-    fn short_name(&self) -> &str { "Ethernet" }
-    fn full_name(&self) -> &str { "IEEE 802.3 Ethernet" }
+    fn short_name(&self) -> &'static str { "Ethernet" }
+    fn full_name(&self) -> &'static str { "IEEE 802.3 Ethernet" }
     fn dissect(&self, data: &[u8]) -> Result {
         if data.len() < 14 {
             return Error::underflow(14, data.len(), "Ethernet frame")
         }
 
         let mut values:Vec<NamedValue> = vec![];
-        values.push(("Destination".to_string(), mac_address(&data[0..6])));
-        values.push(("Source".to_string(), mac_address(&data[6..12])));
+        values.push(("Destination", mac_address(&data[0..6])));
+        values.push(("Source", mac_address(&data[6..12])));
 
         // The type/length field might be either a type or a length.
         let tlen = unsigned::<u16,NetworkEndian>(&data[12..14]);
@@ -63,13 +63,13 @@ impl Protocol for Ethernet {
 
         match tlen {
             Ok(i) if i <= 1500 => {
-                values.push(("Length".to_string(), Val::base10(i)));
+                values.push(("Length", Val::base10(i)));
 
                 let index = i as usize;
                 let packet_data = remainder[..index].to_vec();
                 let padding = remainder[index..].to_vec();
-                values.push(("Data".to_string(), Ok(Val::Bytes(packet_data))));
-                values.push(("Padding".to_string(), Ok(Val::Bytes(padding))));
+                values.push(("Data", Ok(Val::Bytes(packet_data))));
+                values.push(("Padding", Ok(Val::Bytes(padding))));
             },
 
             Ok(i) => {
@@ -82,17 +82,14 @@ impl Protocol for Ethernet {
 
                     0x9000 => Box::new(testproto::TestProtocol),
 
-                    _ => RawBytes::unknown_protocol(&format!["0x{:x}", i]),
+                    _ => RawBytes::unknown_protocol("Unknown Ethertype"),
                 };
 
-                let protoname = protocol.short_name().to_string();
-                let description = protocol.full_name().to_string();
-
-                values.push(("Type".to_string(), Ok(Val::Enum(i as u64, protoname))));
-                values.push((description, protocol.dissect(remainder)));
+                values.push(("Type", Ok(Val::Enum(i as u64, protocol.short_name()))));
+                values.push((protocol.full_name(), protocol.dissect(remainder)));
             },
             Err(e) => {
-                values.push(("Type/length".to_string(), Err(e)));
+                values.push(("Type/length", Err(e)));
             },
         };
 
