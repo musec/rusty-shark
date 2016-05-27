@@ -68,7 +68,8 @@ impl Protocol for IPv4 {
         // Protocol number (assigned by IANA)
         let proto_id = data[9] as u64;
         let protocol:Box<Protocol> = match proto_id {
-            // TODO: UDP, TCP, etc.
+            // TODO: TCP, etc.
+            17 => Box::new(udp::UDP),
             _ => RawBytes::unknown_protocol(&format!["0x{:x}", proto_id]),
         };
         let protoname:String = protocol.short_name().to_string();
@@ -97,3 +98,5 @@ impl Protocol for IPv4 {
         Ok(Val::Subpacket(values))
     }
 }
+
+pub mod udp;
