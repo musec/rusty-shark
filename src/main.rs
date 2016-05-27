@@ -52,8 +52,9 @@ fn main() {
         .unwrap_or_else(|e| e.exit())
         ;
 
+    println!["rshark v{}", VERSION.unwrap_or("<unknown>")];
+
     if args.flag_version {
-        println!["rshark v{}", VERSION.unwrap_or("<unknown>")];
         return;
     }
 
