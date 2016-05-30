@@ -35,8 +35,8 @@ impl Protocol for UDP {
         let length = unsigned::<u16, NetworkEndian>(&data[4..6]);
         let checksum = unsigned::<u16, NetworkEndian>(&data[6..8]);
 
-        let protocol = match (&source,&dest) {
-            (&Ok(_), &Ok(_)) => RawBytes::boxed("UNKNOWN", "unknown UDP protocol"),
+        let protocol:Box<Protocol> = match (&source,&dest) {
+            (&Ok(s), &Ok(d)) => protocol(s, d),
             _ => RawBytes::unknown_protocol("UDP error"),
         };
 
@@ -50,5 +50,13 @@ impl Protocol for UDP {
             ;
 
         Ok(Val::Subpacket(values))
+    }
+}
+
+
+/// Find the UDP protocol that uses given source and destination ports.
+pub fn protocol(source_port: u16, dest_port: u16) -> Box<Protocol> {
+    match (source_port, dest_port) {
+        (_, _) => RawBytes::boxed("UNKNOWN", "unknown UDP protocol"),
     }
 }
