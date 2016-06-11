@@ -9,7 +9,9 @@
 
     <title>rshark::Val - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
+    
 
     
     
@@ -25,7 +27,7 @@
     
 
     <nav class="sidebar">
-        <a href='../rshark/index.html'><img src='https://raw.githubusercontent.com/musec/rusty-shark/master/artwork/wordmark.png' alt='' width='100'></a>
+        <a href='../rshark/index.html'><img src='https://raw.githubusercontent.com/musec/rusty-shark/master/artwork/wordmark.png' alt='logo' width='100'></a>
         <p class='location'><a href='index.html'>rshark</a></p><script>window.sidebarCurrent = {name: 'Val', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
@@ -42,43 +44,57 @@
 
     <section id='main' class="content enum">
 <h1 class='fqn'><span class='in-band'>Enum <a href='index.html'>rshark</a>::<wbr><a class='enum' href=''>Val</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-9' class='srclink' href='../src/rshark/lib.rs.html#87-105' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-18' class='srclink' href='../src/rshark/src/lib.rs.html#94-122' title='goto source code'>[src]</a></span></h1>
 <pre class='rust enum'>pub enum Val {
-    Signed(<a href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>),
-    Unsigned(<a href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>),
+    Signed(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>),
+    Unsigned {
+        value: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>,
+        radix: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>,
+    },
+    Enum(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>, &amp;'static <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>),
     String(<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>),
     Address {
-        bytes: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;,
+        bytes: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;,
         encoded: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,
     },
-    Object(<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='type' href='../rshark/type.NamedValue.html' title='rshark::NamedValue'>NamedValue</a>&gt;),
-    Bytes(<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;),
+    Subpacket(<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='type' href='../rshark/type.NamedValue.html' title='rshark::NamedValue'>NamedValue</a>&gt;),
+    Bytes(<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;),
+    Error(<a class='enum' href='../rshark/enum.Error.html' title='rshark::Error'>Error</a>),
+    Warning(<a class='enum' href='../rshark/enum.Error.html' title='rshark::Error'>Error</a>),
 }</pre><div class='docblock'><p>A value parsed from a packet.</p>
 
-<h1 id="todo" class='section-header'><a
-                           href="#todo">TODO</a></h1>
+<h1 id='todo' class='section-header'><a href='#todo'>TODO</a></h1>
 <p>This value type isn&#39;t as expressive as would be required for a real
 Wireshark replacement just yet. Additional needs include:</p>
 
 <ul>
 <li>tracking original bytes (by reference or by index?)</li>
-<li>supporting error metadata (e.g., &quot;parsed ok but checksum doesn&#39;t match&quot;)</li>
-<li>supporting asynchronous sub-object parsing (some sort of promises?)</li>
 </ul>
 </div><h2 class='variants'>Variants</h2>
-<table><tr><td id='variant.Signed'><code>Signed</code></td><td><div class='docblock'><p>A signed integer, in machine-native representation.</p>
-</div></td></tr><tr><td id='variant.Unsigned'><code>Unsigned</code></td><td><div class='docblock'><p>An unsigned integer, in machine-native representation.</p>
-</div></td></tr><tr><td id='variant.String'><code>String</code></td><td><div class='docblock'><p>A UTF-8–encoded string.</p>
-</div></td></tr><tr><td id='variant.Address'><code>Address</code></td><td><div class='docblock'><p>A network address, which can have its own special encoding.</p>
+<table class='variants_table'><tr><td id='variant.Signed'><code>Signed</code></td><td><div class='docblock'><p>A signed integer, in machine-native representation.</p>
+</div></td><td></td></tr><tr><td id='variant.Unsigned'><code>Unsigned</code></td><td><div class='docblock'><p>An unsigned integer, in machine-native representation, and a radix (base) for
+when we display the value to the user (e.g., 0x100 vs 256).</p>
 </div><h3 class='fields'>Fields</h3>
 
-                                              <table><tr><td id='variant.Address.field.bytes'><code>bytes</code></td><td></td></tr><tr><td id='variant.Address.field.encoded'><code>encoded</code></td><td></td></tr></table></td></tr><tr><td id='variant.Object'><code>Object</code></td><td><div class='docblock'><p>A sub-object is an ordered set of (name,value) tuples.</p>
-</div></td></tr><tr><td id='variant.Bytes'><code>Bytes</code></td><td><div class='docblock'><p>Raw bytes, e.g., a checksum or just unparsed data.</p>
-</div></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='enum' href='../rshark/enum.Val.html' title='rshark::Val'>Val</a></code></h3><div class='impl-items'><h4 id='method.pretty_print' class='method'><code>fn <a href='#method.pretty_print' class='fnname'>pretty_print</a>(&amp;self, indent: <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code></h4>
-</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html' title='core::fmt::Display'>Display</a> for <a class='enum' href='../rshark/enum.Val.html' title='rshark::Val'>Val</a></code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html#method.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+                           <table><tr><td id='variant.Unsigned.field.value'><code>value</code></td><td></td></tr><tr><td id='variant.Unsigned.field.radix'><code>radix</code></td><td></td></tr></table></td><td></td></tr><tr><td id='variant.Enum'><code>Enum</code></td><td><div class='docblock'><p>An integer value that represents a symbolic value.</p>
+</div></td><td></td></tr><tr><td id='variant.String'><code>String</code></td><td><div class='docblock'><p>A UTF-8–encoded string.</p>
+</div></td><td></td></tr><tr><td id='variant.Address'><code>Address</code></td><td><div class='docblock'><p>A network address, which can have its own special encoding.</p>
+</div><h3 class='fields'>Fields</h3>
+
+                           <table><tr><td id='variant.Address.field.bytes'><code>bytes</code></td><td></td></tr><tr><td id='variant.Address.field.encoded'><code>encoded</code></td><td></td></tr></table></td><td></td></tr><tr><td id='variant.Subpacket'><code>Subpacket</code></td><td><div class='docblock'><p>A set of named values from an encapsulated packet (e.g., TCP within IP).</p>
+</div></td><td></td></tr><tr><td id='variant.Bytes'><code>Bytes</code></td><td><div class='docblock'><p>Raw bytes, e.g., a checksum or just unparsed data.</p>
+</div></td><td></td></tr><tr><td id='variant.Error'><code>Error</code></td><td><div class='docblock'><p>An error that stopped further parsing.</p>
+</div></td><td></td></tr><tr><td id='variant.Warning'><code>Warning</code></td><td><div class='docblock'><p>A problem with a packet that did not stop further parsing (e.g., bad checksum).</p>
+</div></td><td></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='enum' href='../rshark/enum.Val.html' title='rshark::Val'>Val</a></code></h3><div class='impl-items'><h4 id='method.base2' class='method'><code>fn <a href='#method.base2' class='fnname'>base2</a>&lt;T&gt;(x: T) -&gt; <a class='type' href='../rshark/type.Result.html' title='rshark::Result'>Result</a>&lt;<a class='enum' href='../rshark/enum.Val.html' title='rshark::Val'>Val</a>&gt; <span class='where'>where T: <a class='trait' href='../num_traits/cast/trait.ToPrimitive.html' title='num_traits::cast::ToPrimitive'>ToPrimitive</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html' title='core::fmt::Display'>Display</a></span></code></h4>
+<h4 id='method.base10' class='method'><code>fn <a href='#method.base10' class='fnname'>base10</a>&lt;T&gt;(x: T) -&gt; <a class='type' href='../rshark/type.Result.html' title='rshark::Result'>Result</a>&lt;<a class='enum' href='../rshark/enum.Val.html' title='rshark::Val'>Val</a>&gt; <span class='where'>where T: <a class='trait' href='../num_traits/cast/trait.ToPrimitive.html' title='num_traits::cast::ToPrimitive'>ToPrimitive</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html' title='core::fmt::Display'>Display</a></span></code></h4>
+<h4 id='method.base16' class='method'><code>fn <a href='#method.base16' class='fnname'>base16</a>&lt;T&gt;(x: T) -&gt; <a class='type' href='../rshark/type.Result.html' title='rshark::Result'>Result</a>&lt;<a class='enum' href='../rshark/enum.Val.html' title='rshark::Val'>Val</a>&gt; <span class='where'>where T: <a class='trait' href='../num_traits/cast/trait.ToPrimitive.html' title='num_traits::cast::ToPrimitive'>ToPrimitive</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html' title='core::fmt::Display'>Display</a></span></code></h4>
+<h4 id='method.unsigned' class='method'><code>fn <a href='#method.unsigned' class='fnname'>unsigned</a>&lt;T&gt;(x: T, radix: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>) -&gt; <a class='type' href='../rshark/type.Result.html' title='rshark::Result'>Result</a>&lt;<a class='enum' href='../rshark/enum.Val.html' title='rshark::Val'>Val</a>&gt; <span class='where'>where T: <a class='trait' href='../num_traits/cast/trait.ToPrimitive.html' title='num_traits::cast::ToPrimitive'>ToPrimitive</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html' title='core::fmt::Display'>Display</a></span></code></h4>
+<h4 id='method.str' class='method'><code>fn <a href='#method.str' class='fnname'>str</a>&lt;Str&gt;(s: Str) -&gt; <a class='enum' href='../rshark/enum.Val.html' title='rshark::Val'>Val</a> <span class='where'>where Str: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</span></code></h4>
+<h4 id='method.pretty_print' class='method'><code>fn <a href='#method.pretty_print' class='fnname'>pretty_print</a>(self, indent_level: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code></h4>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='enum' href='../rshark/enum.Val.html' title='rshark::Val'>Val</a></code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 
@@ -122,7 +138,7 @@ Wireshark replacement just yet. Additional needs include:</p>
 
                 <p>
                     Search functions by type signature (e.g.
-                    <code>vec -> usize</code>)
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
                 </p>
             </div>
         </div>
@@ -138,6 +154,6 @@ Wireshark replacement just yet. Additional needs include:</p>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
     
-    <script async src="../search-index.js"></script>
+    <script defer src="../search-index.js"></script>
 </body>
 </html>

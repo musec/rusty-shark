@@ -9,7 +9,9 @@
 
     <title>rshark::ethernet - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
+    
 
     
     
@@ -25,7 +27,7 @@
     
 
     <nav class="sidebar">
-        <a href='../../rshark/index.html'><img src='https://raw.githubusercontent.com/musec/rusty-shark/master/artwork/wordmark.png' alt='' width='100'></a>
+        <a href='../../rshark/index.html'><img src='https://raw.githubusercontent.com/musec/rusty-shark/master/artwork/wordmark.png' alt='logo' width='100'></a>
         <p class='location'><a href='../index.html'>rshark</a></p><script>window.sidebarCurrent = {name: 'ethernet', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
     </nav>
 
@@ -42,21 +44,28 @@
 
     <section id='main' class="content mod">
 <h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>rshark</a>::<wbr><a class='mod' href=''>ethernet</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-1482' class='srclink' href='../../src/rshark/ethernet.rs.html#16-81' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-236' class='srclink' href='../../src/rshark/src/ethernet/mod.rs.html#10-100' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Dissection of Ethernet (IEEE 802.3) frames.</p>
-</div><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
-                    <tr class=' module-item'>
-                        <td><a class='fn' href='fn.dissect.html'
-                               title='rshark::ethernet::dissect'>dissect</a></td>
-                        <td class='docblock short'>
-                             
-                        </td>
-                    </tr>
-                </table></section>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.Ethernet.html'
+                                  title='rshark::ethernet::Ethernet'>Ethernet</a></td>
+                           <td class='docblock short'>
+                                <p>The IEEE 802.3 Ethernet protocol.</p>
+                           </td>
+                       </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.mac_address.html'
+                                  title='rshark::ethernet::mac_address'>mac_address</a></td>
+                           <td class='docblock short'>
+                                <p>Parse a six-byte MAC address, which can be encoded as, e.g., ff:ff:ff:ff:ff:ff.</p>
+                           </td>
+                       </tr></table></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
@@ -99,7 +108,7 @@
 
                 <p>
                     Search functions by type signature (e.g.
-                    <code>vec -> usize</code>)
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
                 </p>
             </div>
         </div>
@@ -115,6 +124,6 @@
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     
-    <script async src="../../search-index.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>

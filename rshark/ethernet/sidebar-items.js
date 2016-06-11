@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["dissect",""]]});
+initSidebarItems({"fn":[["mac_address","Parse a six-byte MAC address, which can be encoded as, e.g., ff:ff:ff:ff:ff:ff."]],"struct":[["Ethernet","The IEEE 802.3 Ethernet protocol."]]});

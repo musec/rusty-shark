@@ -4,12 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/Users/jon/.cargo/registry/src/github.com-0a35038f75765ae4/docopt-0.6.70/src/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/jon/.cargo/registry/src/github.com-88ac128001ac3a9a/docopt-0.6.80/src/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
+    
 
     
     
@@ -24,17 +26,17 @@
 
     
 
-    <section class="sidebar">
+    <nav class="sidebar">
         
         
-    </section>
+    </nav>
 
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
                 <input class="search-input" name="search"
                        autocomplete="off"
-                       placeholder="Click or press 'S' to search, '?' for more options..."
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
                        type="search">
             </div>
         </form>
@@ -296,7 +298,7 @@
 <span class='doccomment'>//! use docopt::Docopt;</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Write the Docopt usage string.</span>
-<span class='doccomment'>//! static USAGE: &amp;&#39;static str = &quot;</span>
+<span class='doccomment'>//! const USAGE: &amp;&#39;static str = &quot;</span>
 <span class='doccomment'>//! Usage: cp [-a] &lt;source&gt; &lt;dest&gt;</span>
 <span class='doccomment'>//!        cp [-a] &lt;source&gt;... &lt;dir&gt;</span>
 <span class='doccomment'>//!</span>
@@ -336,7 +338,7 @@
 <span class='doccomment'>//! use docopt::Docopt;</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Write the Docopt usage string.</span>
-<span class='doccomment'>//! static USAGE: &amp;&#39;static str = &quot;</span>
+<span class='doccomment'>//! const USAGE: &amp;&#39;static str = &quot;</span>
 <span class='doccomment'>//! Usage: cp [-a] &lt;source&gt; &lt;dest&gt;</span>
 <span class='doccomment'>//!        cp [-a] &lt;source&gt;... &lt;dir&gt;</span>
 <span class='doccomment'>//!</span>
@@ -379,7 +381,7 @@
 <span class='doccomment'>//! use docopt::Docopt;</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Write the Docopt usage string.</span>
-<span class='doccomment'>//! static USAGE: &amp;&#39;static str = &quot;</span>
+<span class='doccomment'>//! const USAGE: &amp;&#39;static str = &quot;</span>
 <span class='doccomment'>//! Usage: rustc [options] [--cfg SPEC... -L PATH...] INPUT</span>
 <span class='doccomment'>//!        rustc (--help | --version)</span>
 <span class='doccomment'>//!</span>
@@ -529,40 +531,49 @@
 
     <section class="footer"></section>
 
-    <div id="help" class="hidden">
-        <div class="shortcuts">
-            <h1>Keyboard shortcuts</h1>
-            <dl>
-                <dt>?</dt>
-                <dd>Show this help dialog</dd>
-                <dt>S</dt>
-                <dd>Focus the search field</dd>
-                <dt>&larrb;</dt>
-                <dd>Move up in search results</dd>
-                <dt>&rarrb;</dt>
-                <dd>Move down in search results</dd>
-                <dt>&#9166;</dt>
-                <dd>Go to active search result</dd>
-            </dl>
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
         </div>
-        <div class="infos">
-            <h1>Search tricks</h1>
-            <p>
-                Prefix searches with a type followed by a colon (e.g.
-                <code>fn:</code>) to restrict the search to a given type.
-            </p>
-            <p>
-                Accepted types are: <code>fn</code>, <code>mod</code>,
-                <code>struct</code>, <code>enum</code>,
-                <code>trait</code>, <code>typedef</code> (or
-                <code>tdef</code>).
-            </p>
-            <p>
-                Search functions by type signature (e.g.
-                <code>vec -> usize</code>)
-            </p>
-        </div>
-    </div>
+    </aside>
 
     
 
@@ -574,6 +585,6 @@
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     
-    <script async src="../../search-index.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>

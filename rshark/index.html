@@ -9,7 +9,9 @@
 
     <title>rshark - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
+    
 
     
     
@@ -25,7 +27,7 @@
     
 
     <nav class="sidebar">
-        <a href='../rshark/index.html'><img src='https://raw.githubusercontent.com/musec/rusty-shark/master/artwork/wordmark.png' alt='' width='100'></a>
+        <a href='../rshark/index.html'><img src='https://raw.githubusercontent.com/musec/rusty-shark/master/artwork/wordmark.png' alt='logo' width='100'></a>
         <p class='location'></p><script>window.sidebarCurrent = {name: 'rshark', ty: 'mod', relpath: '../'};</script>
     </nav>
 
@@ -42,15 +44,14 @@
 
     <section id='main' class="content mod">
 <h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>rshark</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-0' class='srclink' href='../src/rshark/lib.rs.html#16-286' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-0' class='srclink' href='../src/rshark/src/lib.rs.html#10-331' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p><code>rshark</code>, the Rusty Shark library, is a library for deep inspection
 of malicious packets.</p>
 
-<h1 id="background" class='section-header'><a
-                           href="#background">Background</a></h1>
+<h1 id='background' class='section-header'><a href='#background'>Background</a></h1>
 <p><a href="https://www.wireshark.org">Wireshark</a> is a very useful tool for network
 debugging, but it&#39;s had its
 <a href="https://www.wireshark.org/security">fair share of security vulnerabilities</a>.
@@ -71,8 +72,7 @@ affect the interpretation of the <em>current</em> data, rather than <em>all</em>
 That is to say, Rusty Shark is compartmentalized to minimize the damage that
 can be done by a successful adversary. The submarine metaphors write themselves.</p>
 
-<h1 id="usage" class='section-header'><a
-                           href="#usage">Usage</a></h1>
+<h1 id='usage' class='section-header'><a href='#usage'>Usage</a></h1>
 <p><em>note: for help on the <code>rshark</code> command-line client,
 run <code>man rshark</code> or <code>rshark --help</code>.</em></p>
 
@@ -82,6 +82,7 @@ conform to the <code>rshark::Dissector</code> function type, takes as input a sl
 and returns an <code>rshark::Result</code> (which defaults to
 <code>Result&lt;rshark::Val, rshark::Error&gt;</code>).
 Usage is pretty simple:</p>
+
 <pre class='rust rust-example-rendered'>
 <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[];
 
@@ -95,108 +96,88 @@ Usage is pretty simple:</p>
 sub-objects.</p>
 </div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
-                    <tr class=' module-item'>
-                        <td><a class='mod' href='ethernet/index.html'
-                               title='rshark::ethernet'>ethernet</a></td>
-                        <td class='docblock short'>
-                             <p>Dissection of Ethernet (IEEE 802.3) frames.</p>
-
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='mod' href='ip/index.html'
-                               title='rshark::ip'>ip</a></td>
-                        <td class='docblock short'>
-                             <p>Dissection of Internet Protocol (IP) packets.</p>
-
-                        </td>
-                    </tr>
-                </table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='ethernet/index.html'
+                                  title='rshark::ethernet'>ethernet</a></td>
+                           <td class='docblock short'>
+                                <p>Dissection of Ethernet (IEEE 802.3) frames.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='ip/index.html'
+                                  title='rshark::ip'>ip</a></td>
+                           <td class='docblock short'>
+                                <p>Dissection of Internet Protocol (IP) packets.</p>
+                           </td>
+                       </tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
-                    <tr class=' module-item'>
-                        <td><a class='enum' href='enum.Endianness.html'
-                               title='rshark::Endianness'>Endianness</a></td>
-                        <td class='docblock short'>
-                             <p>Little- or big-endian integer representations.</p>
-
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='enum' href='enum.Error.html'
-                               title='rshark::Error'>Error</a></td>
-                        <td class='docblock short'>
-                             <p>An error related to packet dissection (underflow, bad value, etc.).</p>
-
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='enum' href='enum.Val.html'
-                               title='rshark::Val'>Val</a></td>
-                        <td class='docblock short'>
-                             <p>A value parsed from a packet.</p>
-
-                        </td>
-                    </tr>
-                </table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.Future.html'
+                                  title='rshark::Future'>Future</a></td>
+                           <td class='docblock short'>
+                                <p>An undetermined value.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.RawBytes.html'
+                                  title='rshark::RawBytes'>RawBytes</a></td>
+                           <td class='docblock short'>
+                                <p>Dissector of last resort: store raw bytes without interpretation.</p>
+                           </td>
+                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
 <table>
-                    <tr class=' module-item'>
-                        <td><a class='fn' href='fn.raw.html'
-                               title='rshark::raw'>raw</a></td>
-                        <td class='docblock short'>
-                             <p>Dissector of last resort: store raw bytes without interpretation.</p>
-
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='fn' href='fn.signed.html'
-                               title='rshark::signed'>signed</a></td>
-                        <td class='docblock short'>
-                             <p>Parse a signed integer of a given endianness from a byte buffer.</p>
-
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='fn' href='fn.unsigned.html'
-                               title='rshark::unsigned'>unsigned</a></td>
-                        <td class='docblock short'>
-                             <p>Parse a signed integer of a given endianness from a byte buffer.</p>
-
-                        </td>
-                    </tr>
-                </table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
+                       <tr class=' module-item'>
+                           <td><a class='enum' href='enum.Error.html'
+                                  title='rshark::Error'>Error</a></td>
+                           <td class='docblock short'>
+                                <p>An error related to packet dissection (underflow, bad value, etc.).</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='enum' href='enum.Val.html'
+                                  title='rshark::Val'>Val</a></td>
+                           <td class='docblock short'>
+                                <p>A value parsed from a packet.</p>
+                           </td>
+                       </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
 <table>
-                    <tr class=' module-item'>
-                        <td><a class='type' href='type.Dissector.html'
-                               title='rshark::Dissector'>Dissector</a></td>
-                        <td class='docblock short'>
-                             <p>Type of dissection functions.</p>
-
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='type' href='type.NamedValue.html'
-                               title='rshark::NamedValue'>NamedValue</a></td>
-                        <td class='docblock short'>
-                             <p>A named value-or-error.</p>
-
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='type' href='type.Result.html'
-                               title='rshark::Result'>Result</a></td>
-                        <td class='docblock short'>
-                             <p>The result of a dissection function.</p>
-
-                        </td>
-                    </tr>
-                </table></section>
+                       <tr class=' module-item'>
+                           <td><a class='trait' href='trait.Protocol.html'
+                                  title='rshark::Protocol'>Protocol</a></td>
+                           <td class='docblock short'>
+                                <p>A description of a protocol, including code that can parse it.</p>
+                           </td>
+                       </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.signed.html'
+                                  title='rshark::signed'>signed</a></td>
+                           <td class='docblock short'>
+                                <p>Parse a signed integer of a given endianness from a byte buffer.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.unsigned.html'
+                                  title='rshark::unsigned'>unsigned</a></td>
+                           <td class='docblock short'>
+                                <p>Parse an unsigned integer of a given endianness from a byte buffer.</p>
+                           </td>
+                       </tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='type' href='type.NamedValue.html'
+                                  title='rshark::NamedValue'>NamedValue</a></td>
+                           <td class='docblock short'>
+                                <p>A named value-or-error.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='type' href='type.Result.html'
+                                  title='rshark::Result'>Result</a></td>
+                           <td class='docblock short'>
+                                <p>The result of a dissection function.</p>
+                           </td>
+                       </tr></table></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
@@ -239,7 +220,7 @@ sub-objects.</p>
 
                 <p>
                     Search functions by type signature (e.g.
-                    <code>vec -> usize</code>)
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
                 </p>
             </div>
         </div>
@@ -255,6 +236,6 @@ sub-objects.</p>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
     
-    <script async src="../search-index.js"></script>
+    <script defer src="../search-index.js"></script>
 </body>
 </html>

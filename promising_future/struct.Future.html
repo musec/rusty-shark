@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Future` struct in crate `promising_future`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Future">
+
+    <title>promising_future::Future - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='index.html'>promising_future</a></p><script>window.sidebarCurrent = {name: 'Future', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>promising_future</a>::<wbr><a class='struct' href=''>Future</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-406' class='srclink' href='../src/promising_future/lib.rs.html#124-131' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Future&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a>&gt; {
+    // some fields omitted
+}</pre><div class='docblock'><p>An undetermined value.</p>
+
+<p>A <code>Future</code> represents an undetermined value. A corresponding <code>Promise</code> may set the value.</p>
+
+<p>It is typically created in a pair with a <code>Promise</code> using the function <code>future_promise()</code>.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a>&gt; <a class='struct' href='../promising_future/struct.Future.html' title='promising_future::Future'>Future</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='method.with_value' class='method'><code>fn <a href='#method.with_value' class='fnname'>with_value</a>(v: T) -&gt; <a class='struct' href='../promising_future/struct.Future.html' title='promising_future::Future'>Future</a>&lt;T&gt;</code></h4>
+<div class='docblock'><p>Construct an already resolved <code>Future</code> with a value. It is equivalent to a <code>Future</code> whose
+<code>Promise</code> has already been fulfilled.</p>
+
+<pre class='rust rust-example-rendered'>
+<span class='kw'>let</span> <span class='ident'>fut</span> <span class='op'>=</span> <span class='ident'>Future</span>::<span class='ident'>with_value</span>(<span class='number'>123</span>);
+<span class='kw'>match</span> <span class='ident'>fut</span>.<span class='ident'>poll</span>() {
+   <span class='ident'>Pollresult</span>::<span class='ident'>Resolved</span>(<span class='prelude-val'>Some</span>(<span class='number'>123</span>)) <span class='op'>=&gt;</span> <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;ok&quot;</span>),
+   _ <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;unexpected result&quot;</span>),
+}</pre>
+</div><h4 id='method.never' class='method'><code>fn <a href='#method.never' class='fnname'>never</a>() -&gt; <a class='struct' href='../promising_future/struct.Future.html' title='promising_future::Future'>Future</a>&lt;T&gt;</code></h4>
+<div class='docblock'><p>Construct a resolved <code>Future</code> which will never have a value; it is equivalent to a <code>Future</code>
+whose <code>Promise</code> completed unfulfilled.</p>
+
+<pre class='rust rust-example-rendered'>
+<span class='kw'>let</span> <span class='ident'>fut</span> <span class='op'>=</span> <span class='ident'>Future</span>::<span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>::<span class='ident'>never</span>();
+<span class='kw'>match</span> <span class='ident'>fut</span>.<span class='ident'>poll</span>() {
+   <span class='ident'>Pollresult</span>::<span class='ident'>Resolved</span>(<span class='prelude-val'>None</span>) <span class='op'>=&gt;</span> <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;ok&quot;</span>),
+   _ <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;unexpected result&quot;</span>),
+}</pre>
+</div><h4 id='method.poll' class='method'><code>fn <a href='#method.poll' class='fnname'>poll</a>(self) -&gt; <a class='enum' href='../promising_future/enum.Pollresult.html' title='promising_future::Pollresult'>Pollresult</a>&lt;T&gt;</code></h4>
+<div class='docblock'><p>Test to see if the <code>Future</code> is resolved yet.</p>
+
+<p>It returns an <code>Pollresult</code>, which has two values:</p>
+
+<ul>
+<li><code>Unresolved(Future&lt;T&gt;)</code> - the <code>Future</code> is not yet resolved, so returns itself, or</li>
+<li><code>Resolved(Option&lt;T&gt;)</code> - the <code>Future</code> has been resolved, and may have a value.</li>
+</ul>
+
+<pre class='rust rust-example-rendered'>
+<span class='kw'>match</span> <span class='ident'>fut</span>.<span class='ident'>poll</span>() {
+  <span class='ident'>Pollresult</span>::<span class='ident'>Unresolved</span>(<span class='ident'>fut</span>) <span class='op'>=&gt;</span> <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;unresolved future {:?}&quot;</span>, <span class='ident'>fut</span>),
+  <span class='ident'>Pollresult</span>::<span class='ident'>Resolved</span>(<span class='prelude-val'>None</span>) <span class='op'>=&gt;</span> <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;resolved, no value&quot;</span>),
+  <span class='ident'>Pollresult</span>::<span class='ident'>Resolved</span>(<span class='prelude-val'>Some</span>(<span class='ident'>v</span>)) <span class='op'>=&gt;</span> <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;resolved, value {}&quot;</span>, <span class='ident'>v</span>),
+}</pre>
+</div><h4 id='method.value' class='method'><code>fn <a href='#method.value' class='fnname'>value</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;T&gt;</code></h4>
+<div class='docblock'><p>Block until the <code>Future</code> is resolved.</p>
+
+<p>If the <code>Future</code> is not yet resolved, it will block until the corresponding <code>Promise</code> is
+either fulfilled, or is completed unfulfilled. In the former case it will return <code>Some(v)</code>,
+otherwise <code>None</code>.</p>
+
+<p>If the <code>Future</code> is already resolved - ie, has no corresponding <code>Promise</code> - then it will
+return immediately without blocking.</p>
+
+<pre class='rust rust-example-rendered'>
+<span class='kw'>match</span> <span class='ident'>fut</span>.<span class='ident'>value</span>() {
+  <span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;has value {}&quot;</span>, <span class='ident'>v</span>),
+  <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;no value&quot;</span>),
+}</pre>
+</div><h4 id='method.chain' class='method'><code>fn <a href='#method.chain' class='fnname'>chain</a>&lt;F, U&gt;(self, func: F) -&gt; <a class='struct' href='../promising_future/struct.Future.html' title='promising_future::Future'>Future</a>&lt;U&gt; <span class='where'>where F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html' title='core::ops::FnOnce'>FnOnce</a>(<a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;T&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;U&gt; + <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> + 'static, T: 'static, U: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> + 'static</span></code></h4>
+<div class='docblock'><p>Chain two <code>Future</code>s.</p>
+
+<p>Asynchronously apply a function to the result of a <code>Future</code>, returning a new <code>Future</code> for
+that value. This may spawn a thread to block waiting for the first <code>Future</code> to complete.</p>
+
+<p>The function is passed an <code>Option</code>, which indicates whether the <code>Future</code> ever received a
+value. The function returns an <code>Option</code> so that the resulting <code>Future</code> can also be
+valueless.</p>
+</div><h4 id='method.chain_with' class='method'><code>fn <a href='#method.chain_with' class='fnname'>chain_with</a>&lt;F, U, S&gt;(self, func: F, spawner: &amp;S) -&gt; <a class='struct' href='../promising_future/struct.Future.html' title='promising_future::Future'>Future</a>&lt;U&gt; <span class='where'>where F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html' title='core::ops::FnOnce'>FnOnce</a>(<a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;T&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;U&gt; + <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> + 'static, T: 'static, U: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> + 'static, S: <a class='trait' href='../promising_future/trait.Spawner.html' title='promising_future::Spawner'>Spawner</a></span></code></h4>
+<div class='docblock'><p>As with <code>chain</code>, but pass a <code>Spawner</code> to control how the thread is created.</p>
+</div><h4 id='method.then_opt' class='method'><code>fn <a href='#method.then_opt' class='fnname'>then_opt</a>&lt;F, U&gt;(self, func: F) -&gt; <a class='struct' href='../promising_future/struct.Future.html' title='promising_future::Future'>Future</a>&lt;U&gt; <span class='where'>where F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html' title='core::ops::FnOnce'>FnOnce</a>(<a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;T&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;U&gt; + <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> + 'static, U: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> + 'static</span></code></h4>
+<div class='docblock'><p>Set a synchronous callback to run in the Promise&#39;s context.</p>
+
+<p>When the <code>Future&lt;T&gt;</code> completes, call the function on the value
+(if any), returning a new value which appears in the returned
+<code>Future&lt;U&gt;</code>.</p>
+
+<p>The function is called within the <code>Promise</code>s context, and so
+will block the thread if it takes a long time. Because the
+callback returns a value, not a <code>Future</code> it cannot be
+async. See <code>callback</code> or <code>chain</code> for more general async ways
+to apply a function to a <code>Future</code>.</p>
+
+<pre class='rust rust-example-rendered'>
+<span class='kw'>let</span> (<span class='ident'>fut</span>, <span class='ident'>prom</span>) <span class='op'>=</span> <span class='ident'>future_promise</span>();
+
+<span class='kw'>let</span> <span class='ident'>fut</span> <span class='op'>=</span> <span class='ident'>fut</span>.<span class='ident'>then_opt</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='ident'>v</span>.<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='ident'>v</span> <span class='op'>+</span> <span class='number'>123</span>));
+<span class='ident'>prom</span>.<span class='ident'>set</span>(<span class='number'>1</span>);
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>fut</span>.<span class='ident'>value</span>(), <span class='prelude-val'>Some</span>(<span class='number'>124</span>))</pre>
+</div><h4 id='method.then' class='method'><code>fn <a href='#method.then' class='fnname'>then</a>&lt;F, U&gt;(self, func: F) -&gt; <a class='struct' href='../promising_future/struct.Future.html' title='promising_future::Future'>Future</a>&lt;U&gt; <span class='where'>where F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html' title='core::ops::FnOnce'>FnOnce</a>(T) -&gt; U + <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> + 'static, U: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> + 'static</span></code></h4>
+<div class='docblock'><p>Set synchronous callback</p>
+
+<p>Simplest form of callback. This is only called if the promise
+is fulfilled, and may only allow a promise to be fulfilled.</p>
+</div><h4 id='method.callback' class='method'><code>fn <a href='#method.callback' class='fnname'>callback</a>&lt;F, U&gt;(self, func: F) -&gt; <a class='struct' href='../promising_future/struct.Future.html' title='promising_future::Future'>Future</a>&lt;U&gt; <span class='where'>where F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnOnce.html' title='core::ops::FnOnce'>FnOnce</a>(<a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;T&gt;, <a class='struct' href='../promising_future/struct.Promise.html' title='promising_future::Promise'>Promise</a>&lt;U&gt;) + <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> + 'static, U: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> + 'static</span></code></h4>
+<div class='docblock'><p>Set a callback to run in the <code>Promise</code>&#39;s context.</p>
+
+<p>This function sets a general purpose callback which is called
+when a <code>Future</code> is resolved. It is called in the <code>Promise</code>&#39;s
+context, so if it is long-running it will block whatever
+thread that is. (If the <code>Future</code> is already resolved, it is
+the calling thread.)</p>
+
+<p>The value passed to the callback is an <code>Option</code> - if it is
+<code>None</code> it means the promise was unfulfilled.</p>
+
+<p>The callback is passed a new <code>Promise&lt;U&gt;</code> which is paired with
+the <code>Future&lt;U&gt;</code> this function returns; the callback may either
+set a value on it, pass it somewhere else, or simply drop it
+leaving the promise unfulfilled.</p>
+
+<p>This is the most general form of a completion callback; see
+also <code>then</code> and <code>chain</code> for simpler interfaces which are often
+all that&#39;s needed.</p>
+
+<pre class='rust rust-example-rendered'>
+<span class='kw'>let</span> (<span class='ident'>fut</span>, <span class='ident'>prom</span>) <span class='op'>=</span> <span class='ident'>future_promise</span>();
+
+<span class='kw'>let</span> <span class='ident'>fut</span> <span class='op'>=</span> <span class='ident'>fut</span>.<span class='ident'>callback</span>(<span class='op'>|</span><span class='ident'>v</span>, <span class='ident'>p</span><span class='op'>|</span> {
+   <span class='kw'>match</span> <span class='ident'>v</span> {
+     <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> (), <span class='comment'>// drop p</span>
+     <span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>p</span>.<span class='ident'>set</span>(<span class='ident'>v</span> <span class='op'>+</span> <span class='number'>123</span>),
+   }
+});
+<span class='ident'>prom</span>.<span class='ident'>set</span>(<span class='number'>1</span>);
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>fut</span>.<span class='ident'>value</span>(), <span class='prelude-val'>Some</span>(<span class='number'>124</span>))</pre>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;<a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;T&gt;&gt; for <a class='struct' href='../promising_future/struct.Future.html' title='promising_future::Future'>Future</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='method.from' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html#tymethod.from' class='fnname'>from</a>(v: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;T&gt;) -&gt; <a class='struct' href='../promising_future/struct.Future.html' title='promising_future::Future'>Future</a>&lt;T&gt;</code></h4>
+</div><h3 class='impl'><code>impl&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/trait.IntoIterator.html' title='core::iter::IntoIterator'>IntoIterator</a> for <a class='struct' href='../promising_future/struct.Future.html' title='promising_future::Future'>Future</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='associatedtype.Item' class='type'><code>type <a href='https://doc.rust-lang.org/nightly/core/iter/trait.IntoIterator.html#associatedtype.Item' class='type'>Item</a> = T</code></h4>
+<h4 id='associatedtype.IntoIter' class='type'><code>type <a href='https://doc.rust-lang.org/nightly/core/iter/trait.IntoIterator.html#associatedtype.IntoIter' class='type'>IntoIter</a> = <a class='struct' href='../promising_future/struct.FutureIter.html' title='promising_future::FutureIter'>FutureIter</a>&lt;T&gt;</code></h4>
+<h4 id='method.into_iter' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/iter/trait.IntoIterator.html#tymethod.into_iter' class='fnname'>into_iter</a>(self) -&gt; Self::<a class='trait' href='https://doc.rust-lang.org/nightly/core/iter/trait.IntoIterator.html' title='core::iter::IntoIterator'>IntoIter</a></code></h4>
+</div><h3 class='impl'><code>impl&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../promising_future/struct.Future.html' title='promising_future::Future'>Future</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "promising_future";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script defer src="../search-index.js"></script>
+</body>
+</html>

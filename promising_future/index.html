@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `promising_future` crate.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, promising_future">
+
+    <title>promising_future - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'></p><script>window.sidebarCurrent = {name: 'promising_future', ty: 'mod', relpath: '../'};</script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>promising_future</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-0' class='srclink' href='../src/promising_future/lib.rs.html#1-597' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'>
+<h1 id='futures-and-promises' class='section-header'><a href='#futures-and-promises'>Futures and Promises</a></h1>
+<p>Quick example:</p>
+
+<pre class='rust rust-example-rendered'>
+<span class='kw'>let</span> (<span class='ident'>fut</span>, <span class='ident'>prom</span>) <span class='op'>=</span> <span class='ident'>future_promise</span>();
+
+<span class='comment'>// A time-consuming process</span>
+<span class='ident'>thread</span>::<span class='ident'>spawn</span>(<span class='op'>||</span> { <span class='ident'>thread</span>::<span class='ident'>sleep</span>(<span class='ident'>Duration</span>::<span class='ident'>from_millis</span>(<span class='number'>100</span>)); <span class='ident'>prom</span>.<span class='ident'>set</span>(<span class='number'>123</span>) });
+
+<span class='comment'>// do something when the value is ready</span>
+<span class='kw'>let</span> <span class='ident'>fut</span> <span class='op'>=</span> <span class='ident'>fut</span>.<span class='ident'>then</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='ident'>v</span> <span class='op'>+</span> <span class='number'>1</span>);
+
+<span class='comment'>// Wait for the final result</span>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>fut</span>.<span class='ident'>value</span>(), <span class='prelude-val'>Some</span>(<span class='number'>124</span>));</pre>
+
+<p>This module implements a pair of concepts: <code>Future</code>s - a read-only placeholder for a variable
+whose value may not yet be known, and <code>Promise</code>s - a write-once container which sets the
+value.</p>
+
+<p>A <code>Future</code> may either be &quot;resolved&quot; or &quot;unresolved&quot;. An unresolved <code>Future</code> still has a pending
+<code>Promise</code> for it. It becomes resolved once the <code>Promise</code> is complete. Once resolved, it will
+have a value if the <code>Promise</code> was fulfilled (ie, set a value), or no value if the <code>Promise</code> was
+unfulfilled (ie, dropped without setting a value).</p>
+
+<p>A <code>Promise</code> is either &quot;pending&quot; or &quot;complete&quot;. A pending <code>Promise</code> is simply a live value of
+type <code>Promise&lt;T&gt;</code>. It can be fulfilled by setting a value, which consumes the Promise,
+completing it. Alternatively it can be completed unfulfilled by simply dropping the value
+without ever calling <code>set</code> on it.</p>
+
+<p>A <code>Future</code> can also be created already resolved (ie, not paired with a <code>Promise</code>). This is
+useful for lifting values into the <code>Promise</code>/<code>Future</code> domain.</p>
+
+<p><code>Future</code>s may be chained in two ways. The most general way is with <code>callback</code>, which takes a
+<code>Future</code> and a function to act on the value when it becomes available. This function is called
+within the same context that completed the <code>Promise</code> so if the function blocks it will block
+that context. The callback is passed another <code>Promise</code> to take the return of the callback, which
+may be fulfilled or unfulfilled within the callback, or passed on somewhere else.</p>
+
+<p>Using <code>callback</code> directly can be a little cumbersome, so there are a couple of helpers. <code>then</code>
+simply calls a synchronous callback function and uses its return to fulfill the value. The
+function must be run within the <code>Promise</code> context, so it should probably be quick.</p>
+
+<p>Alternatively <code>chain</code> - like <code>then</code> - will take a function to act on the resolved future
+value. However, unlike <code>then</code> it runs it in its own thread, so it can be arbitrarily
+time-consuming. The variant <code>chain_with</code> allows the thread creation to be controlled, so that
+thread pools may be used, for example.</p>
+
+<p>Groups of <code>Future</code>s can be acted upon together. <code>all</code> takes an iterator of <code>Future&lt;T&gt;</code>s, and
+returns a <code>Future&lt;Iterator&lt;T&gt;&gt;</code>, so that its possible to wait for multiple Futures to be
+resolved.</p>
+
+<p>Similarly, <code>any</code> returns the first available value of an iterator of <code>Future</code>s, discarding all
+the other values.</p>
+
+<p>More generally, <code>FutureStream</code> provides a mechanism to wait on an arbitrary number of <code>Futures</code>
+and incrementally acquiring their values as they become available.</p>
+
+<p>If a <code>Future</code> is dropped while its corresponding <code>Promise</code> is still pending, then any value it
+does produce will be discarded. The <code>Promise</code> be queried with its <code>canceled</code> method to see if a
+corresponding <code>Future</code> still exists; if not, it may choose to abort some time-consuming process
+rather than have its output simply discarded.</p>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.Future.html'
+                                  title='promising_future::Future'>Future</a></td>
+                           <td class='docblock short'>
+                                <p>An undetermined value.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.FutureIter.html'
+                                  title='promising_future::FutureIter'>FutureIter</a></td>
+                           <td class='docblock short'>
+                                <p>Blocking iterator for the value of a <code>Future</code>. Returns either 0 or 1 values.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.FutureStream.html'
+                                  title='promising_future::FutureStream'>FutureStream</a></td>
+                           <td class='docblock short'>
+                                <p>Stream of multiple <code>Future</code>s</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.FutureStreamIter.html'
+                                  title='promising_future::FutureStreamIter'>FutureStreamIter</a></td>
+                           <td class='docblock short'>
+                                <p>Iterator for completed <code>Future</code>s in a <code>FutureStream</code>. The iterator incrementally returns values
+from resolved <code>Future</code>s, blocking while there are no unresolved <code>Future</code>s. <code>Future</code>s which
+resolve to no value are discarded.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.FutureStreamWaiter.html'
+                                  title='promising_future::FutureStreamWaiter'>FutureStreamWaiter</a></td>
+                           <td class='docblock short'>
+                                <p>Waiter for <code>Future</code>s in a <code>FutureStream</code>.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.Promise.html'
+                                  title='promising_future::Promise'>Promise</a></td>
+                           <td class='docblock short'>
+                                <p>A box for resolving a <code>Future</code>.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.ThreadSpawner.html'
+                                  title='promising_future::ThreadSpawner'>ThreadSpawner</a></td>
+                           <td class='docblock short'>
+                                <p>An implementation of <code>Spawner</code> that creates normal <code>std::thread</code> threads.</p>
+                           </td>
+                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='enum' href='enum.Pollresult.html'
+                                  title='promising_future::Pollresult'>Pollresult</a></td>
+                           <td class='docblock short'>
+                                <p>Result of calling <code>Future.poll()</code>.</p>
+                           </td>
+                       </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='trait' href='trait.Spawner.html'
+                                  title='promising_future::Spawner'>Spawner</a></td>
+                           <td class='docblock short'>
+                                <p>A trait for spawning threads.</p>
+                           </td>
+                       </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.all.html'
+                                  title='promising_future::all'>all</a></td>
+                           <td class='docblock short'>
+                                <p>Return a Future of all values in an iterator of <code>Future</code>s.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.all_with.html'
+                                  title='promising_future::all_with'>all_with</a></td>
+                           <td class='docblock short'>
+                                <p>Return a Future of all values in an iterator of <code>Future</code>s.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.any.html'
+                                  title='promising_future::any'>any</a></td>
+                           <td class='docblock short'>
+                                <p>Return first available <code>Future</code> from an iterator of <code>Future</code>s.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.future_promise.html'
+                                  title='promising_future::future_promise'>future_promise</a></td>
+                           <td class='docblock short'>
+                                <p>Construct a <code>Future</code>/<code>Promise</code> pair.</p>
+                           </td>
+                       </tr></table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "promising_future";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script defer src="../search-index.js"></script>
+</body>
+</html>

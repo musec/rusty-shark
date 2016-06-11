@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ThreadSpawner","An implementation of `Spawner` that creates normal `std::thread` threads."]],"trait":[["Spawner","A trait for spawning threads."]]});
